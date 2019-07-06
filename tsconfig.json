@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    // "strictNullChecks": false,
+    "outDir": "js/",
+    "target": "es2015",
+    "strict": false,
+    "esModuleInterop": true,
+    "noUnusedLocals": false
+  }
+}
