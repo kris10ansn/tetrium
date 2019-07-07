@@ -4,19 +4,7 @@ export interface ITetromino {
 	matrix: number[][]
 }
 
-interface ITetrominoDimension {
-	x: number
-	y: number
-	width: number
-	height: number
-}
-
-// TODO: Maybe make any.prototype function? (Throw error if "this" isnt ITetromino)
-export function getDimensions(tetromino: ITetromino): ITetrominoDimension {
-	return { x: 1, y: 1, width: 1, height: 1 }
-}
-
-export const Tetrominos: ITetromino[] = [
+export const tetrominos: ITetromino[] = [
 	{
 		name: "T",
 		color: "#FF0D72",

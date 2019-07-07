@@ -19,6 +19,6 @@ export abstract class GameObject {
 	get x() { return this.pos.x }
 	get y() { return this.pos.y }
 
-	set x(value) { this.pos.x = value }
-	set y(value) { this.pos.y = value }
+	set x(val) { this.pos.x = val }
+	set y(val) { this.pos.y = val }
 }

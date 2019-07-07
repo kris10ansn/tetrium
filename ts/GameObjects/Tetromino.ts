@@ -1,27 +1,19 @@
 import { GameObject } from "./GameObject.js";
-import { Tetrominos } from "../utils/tetrominos.js";
-import KeyInput from "../game/KeyInput.js";
+import { tetrominos } from "../utils/tetrominos.js";
 import { ISize } from "../utils/ISize.js";
-import { Vector2D } from "../utils/Vector.js";
+import KeyInput from "../game/KeyInput.js";
 import { Arena } from "../game/Arena.js";
-import Matrix from "../utils/Matrix.js";
-
-//! Rethink everything?
-//? Idea:
-//- Make game "choppy" like before
-//- Draw at smooth position, but calculate choppy position
-//- Dont allow smooth position to go lower/more to the left/rigth than "choppy" pos
 
 export class Tetromino extends GameObject {
-	private shape: number[][];
-	private color: string;
+	public shape: number[][];
+	public color: string;
 
 	private verticalSpeed = 2.6;
 	private boost = 2.75;
 
 	private horizontalSpeed = 12;
 
-	private rotateDelay = 10;
+	private rotateDelay = 9;
 	private rotateTimer = 0;
 
 	constructor(
@@ -29,41 +21,41 @@ export class Tetromino extends GameObject {
 		y: number,
 		private scl: number,
 		private canvasSize: ISize,
-		private arena: Array<Array<number>>,
+		private arena: Arena,
 		private keyboard: KeyInput
 	) {
 		super(x, y);
 
 		this.vel.set(0, 3);
 
-		// const tetromino = Tetrominos[Math.floor(Math.random() * Tetrominos.length)]
-		const tetromino = Tetrominos[2];
+		const index = Math.floor(Math.random() * tetrominos.length);
+		// const index = 4;
+		const tetromino = tetrominos[index];
 		this.shape = tetromino.matrix.copy();
 		this.color = tetromino.color;
-
-		console.log("sy", this.sy)
+		(<any>window).tetromino = this;
 	}
 
-	first = false;
 	tick() {
 		this.handleKeys();
 
-		this.pos.y += this.vel.y;
+		this.y += this.vel.y;
 		if (this.collide()) {
-			this.pos.y -= this.vel.y;
-			this.pos.set(this.xx * this.scl, this.yy * this.scl);
+			this.y -= this.vel.y;
+			this.y = this.yy * this.scl;
+			this.arena.merge(this);
 		}
 
-		this.pos.x += this.vel.x;
+		this.x += this.vel.x;
 		if (this.collide()) {
-			this.pos.x -= this.vel.x;
-
-			if (!this.first) {
-				console.log(this);
-			}
-
-			this.first = true;
+			this.x -= this.vel.x;
 		}
+
+		this.x = Math.min(
+			this.x,
+			this.canvasSize.width - (this.width + this.whitespaceLeft) * this.scl
+		);
+		this.x = Math.max(this.x, -this.whitespaceLeft * this.scl);
 
 		// *Check for collision*
 		// *Move until not colliding*
@@ -72,17 +64,34 @@ export class Tetromino extends GameObject {
 	}
 
 	collide(): boolean {
-		// let collides = this.yy + this.sy + this.height > this.arena.length;
 		let collides =
-			this.y + (this.height * this.scl) + (this.sy * this.scl) >=
-			this.canvasSize.height;
+			this.y + this.height * this.scl + this.whitespaceTop * this.scl >=
+				this.canvasSize.height ||
+			(this.x + this.whitespaceLeft * this.scl < 0 ||
+				this.x + (this.width - this.whitespaceRight) * this.scl >
+					this.canvasSize.width);
+
+		// Have to check both floored and ceiled values to ensure you arent
+		// halfway into a block
+		const xxf = Math.floor(this.x / this.scl);
+		const xxc = Math.ceil(this.x / this.scl);
+
+		const yyc = Math.ceil(this.y / this.scl);
+		const yyf = Math.floor(this.y / this.scl);
 
 		for (let y = 0; y < this.shape.length; y++) {
 			for (let x = 0; x < this.shape[y].length; x++) {
 				if (
 					this.shape[y][x] !== 0 &&
-					this.arena[this.yy + y] && //Checking if row exists
-					this.arena[this.yy + y][this.xx + x] !== 0
+					// Row exists
+					this.arena.matrix[this.yy + y] &&
+					(this.arena.matrix[this.yy + y][xxf + x] !== 0 ||
+						(this.arena.matrix[yyc + y] &&
+							this.arena.matrix[yyc + y][xxc + x] !== 0) ||
+						(this.arena.matrix[yyc + y] &&
+							this.arena.matrix[yyc + y][xxf + x] !== 0) ||
+						this.arena.matrix[this.yy + y][xxc + x] !== 0)
+					// this.arena[yy + y][this.xx + x] !== 0
 				) {
 					collides = true;
 				}
@@ -112,13 +121,7 @@ export class Tetromino extends GameObject {
 		ctx.restore();
 	}
 
-	rotate() {
-		if (this.rotateTimer > 0) {
-			return;
-		} else {
-			this.rotateTimer = this.rotateDelay;
-		}
-
+	rotate(dir = 1) {
 		for (let y = 0; y < this.shape.length; ++y) {
 			for (let x = 0; x < y; ++x) {
 				[this.shape[x][y], this.shape[y][x]] = [
@@ -128,11 +131,24 @@ export class Tetromino extends GameObject {
 			}
 		}
 
-		this.shape.forEach(row => {
-			row.reverse();
-		});
+		if (dir === 1) {
+			this.shape.forEach(row => row.reverse());
+		} else {
+			this.shape.reverse();
+			return;
+		}
 
-		console.log("sy", this.sy)
+		const prevx = this.x;
+		let offset = 1;
+		while (this.collide()) {
+			this.x += offset * this.scl;
+			offset = -(offset + (offset > 0 ? 1 : -1));
+			if (offset > this.shape[0].length) {
+				this.x = prevx;
+				this.rotate(-dir);
+				return;
+			}
+		}
 	}
 
 	handleKeys() {
@@ -152,11 +168,19 @@ export class Tetromino extends GameObject {
 		} else if (right) {
 			this.vel.x = this.horizontalSpeed;
 		} else {
-			this.vel.x = (this.xx * this.scl - this.x) / 3;
+			// Distance to perfect tile placement
+			const v = Math.round((this.xx * this.scl - this.x) / 3);
+
+			// If the distance to the destination is less than .5 pixels
+			// just jump directly to the destination
+			this.vel.x = v === 0 ? this.xx * this.scl - this.x : v;
 		}
 
 		if (up) {
-			this.rotate();
+			if (this.rotateTimer <= 0) {
+				this.rotate();
+				this.rotateTimer = this.rotateDelay;
+			}
 		}
 	}
 
@@ -168,9 +192,7 @@ export class Tetromino extends GameObject {
 	}
 
 	get width() {
-		let width = Math.max(...this.shape.map(row => row.sum()));
-
-		return width;
+		return Math.max(...this.shape.map(row => row.sum()));
 	}
 	get height() {
 		let height = this.shape.length;
@@ -182,13 +204,7 @@ export class Tetromino extends GameObject {
 		return height;
 	}
 
-	// Shape x in array
-	get sx() {
-		return 0;
-	}
-
-	// Shape y in array
-	get sy() {
+	get whitespaceTop() {
 		let y = 0;
 
 		for (let i = 0; i < this.shape.length; i++) {
@@ -200,6 +216,36 @@ export class Tetromino extends GameObject {
 		}
 
 		return y;
+	}
+
+	get whitespaceRight() {
+		let blanks = 0;
+
+		for (let x = this.shape.length - 1; x >= 0; x--) {
+			for (let y = 0; y < this.shape.length; y++) {
+				if (this.shape[y][x] !== 0) {
+					return blanks;
+				}
+			}
+			blanks++;
+		}
+
+		return blanks;
+	}
+
+	get whitespaceLeft() {
+		let blanks = 0;
+
+		for (let x = 0; x < this.shape.length; x++) {
+			for (let y = 0; y < this.shape.length; y++) {
+				if (this.shape[y][x] !== 0) {
+					return blanks;
+				}
+			}
+			blanks++;
+		}
+
+		return blanks;
 	}
 
 	get keys() {

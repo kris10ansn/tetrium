@@ -1,10 +1,10 @@
 {
+  "compileOnSave": true,
   "compilerOptions": {
-    // "strictNullChecks": false,
-    "outDir": "js/",
+    "outDir": "dist/",
     "target": "es2015",
-    "strict": false,
     "esModuleInterop": true,
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "strict": false
   }
 }

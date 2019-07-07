@@ -45,7 +45,7 @@ CanvasRenderingContext2D.prototype.fillCircle = function(x: number, y: number, r
 Array.prototype.remove = function<T>(this: T[], elem: T) : T[] {
 	this.forEach((it, index) => {
 		if(it === elem) {
-			this.slice(index, 1)
+			this.splice(index, 1)
 		}
 	})
 	return this
