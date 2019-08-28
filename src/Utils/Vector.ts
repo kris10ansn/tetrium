@@ -15,7 +15,6 @@ export class Vector2D {
 
 	mult(vec: Vector2D): Vector2D { return new Vector2D(this.x * vec.x, this.y * vec.y) }
 	div (vec: Vector2D): Vector2D { return new Vector2D(this.x / vec.x, this.y / vec.y) }
-
 	
 	addVec(vec: Vector2D) {
 		this.x += vec.x
@@ -54,7 +53,6 @@ export class Vector3D {
 
 	mult(vec: Vector3D): Vector3D { return new Vector3D(this.x * vec.x, this.y * vec.y, this.z * vec.z) }
 	div (vec: Vector3D): Vector3D { return new Vector3D(this.x / vec.x, this.y / vec.y, this.z / vec.z) }
-
 	
 	addVec(vec: Vector3D) {
 		this.x += vec.x

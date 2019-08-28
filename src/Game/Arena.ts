@@ -2,7 +2,7 @@ import { GameObject } from "../GameObjects/GameObject.js";
 import { Tetromino } from "../GameObjects/Tetromino.js";
 import Matrix from "../Utils/Matrix.js";
 import { Game } from "./Game";
-import { color, number } from "../Utils/colors.js";
+import { Color } from "../Utils/Color"
 
 export class Arena {
 	matrix: Matrix<number>;
@@ -40,7 +40,7 @@ export class Arena {
 		this.matrix.forEach((row, y) => {
 			row.forEach((val, x) => {
 				if (val > 0) {
-					ctx.fillStyle = color(val);
+					ctx.fillStyle = Color.fromNumber(val);
 					ctx.fillRect(
 						x * this.game.scl,
 						this.offset + y * this.game.scl,
@@ -67,7 +67,7 @@ export class Arena {
 			for (let x = 0; x < shape[0].length; x++) {
 				if (shape[y][x] !== 0) {
 					try {
-						this.matrix[yy + y][xx + x] = number(color);
+						this.matrix[yy + y][xx + x] = Color.toNumber(color);
 					} catch (e) {
 						return;
 					}

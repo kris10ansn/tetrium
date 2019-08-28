@@ -1,4 +1,3 @@
 dist/
 *.zip
 manifest.json
-tsconfig.json
