@@ -1,38 +1,40 @@
 import { GameObject } from "./GameObject.js";
-import { tetrominos } from "../utils/tetrominos.js";
-import { ISize } from "../utils/ISize.js";
-import KeyInput from "../game/KeyInput.js";
-import { Arena } from "../game/Arena.js";
+import { tetrominos } from "../Utils/Tetrominos.js";
+import KeyInput from "../Game/KeyInput.js";
+import { Arena } from "../Game/Arena.js";
 
 export class Tetromino extends GameObject {
 	public shape: number[][];
 	public color: string;
 
-	private verticalSpeed = 2.6;
-	private boost = 2.75;
-
+	private verticalSpeed = 3;
+	private boost = 7;
 	private horizontalSpeed = 12;
 
-	private rotateDelay = 9;
+	private rotateDelay = 10;
 	private rotateTimer = 0;
+
+	private smooth: boolean = true;
 
 	constructor(
 		x: number,
 		y: number,
 		private scl: number,
-		private canvasSize: ISize,
+		private canvasSize: { width: number, height: number },
 		private arena: Arena,
 		private keyboard: KeyInput
 	) {
 		super(x, y);
 
 		this.vel.set(0, 3);
-
+		
 		const index = Math.floor(Math.random() * tetrominos.length);
-		// const index = 4;
+		// const index = 5;
 		const tetromino = tetrominos[index];
 		this.shape = tetromino.matrix.copy();
 		this.color = tetromino.color;
+
+		// For debugging
 		(<any>window).tetromino = this;
 	}
 
@@ -62,47 +64,16 @@ export class Tetromino extends GameObject {
 
 		if (this.rotateTimer > 0) this.rotateTimer -= 1;
 	}
-
-	collide(): boolean {
-		let collides =
-			this.y + this.height * this.scl + this.whitespaceTop * this.scl >=
-				this.canvasSize.height ||
-			(this.x + this.whitespaceLeft * this.scl < 0 ||
-				this.x + (this.width - this.whitespaceRight) * this.scl >
-					this.canvasSize.width);
-
-		// Have to check both floored and ceiled values to ensure you arent
-		// halfway into a block
-		const xxf = Math.floor(this.x / this.scl);
-		const xxc = Math.ceil(this.x / this.scl);
-
-		const yyc = Math.ceil(this.y / this.scl);
-		const yyf = Math.floor(this.y / this.scl);
-
-		for (let y = 0; y < this.shape.length; y++) {
-			for (let x = 0; x < this.shape[y].length; x++) {
-				if (
-					this.shape[y][x] !== 0 &&
-					// Row exists
-					this.arena.matrix[this.yy + y] &&
-					(this.arena.matrix[this.yy + y][xxf + x] !== 0 ||
-						(this.arena.matrix[yyc + y] &&
-							this.arena.matrix[yyc + y][xxc + x] !== 0) ||
-						(this.arena.matrix[yyc + y] &&
-							this.arena.matrix[yyc + y][xxf + x] !== 0) ||
-						this.arena.matrix[this.yy + y][xxc + x] !== 0)
-					// this.arena[yy + y][this.xx + x] !== 0
-				) {
-					collides = true;
-				}
-			}
-		}
-		return collides;
-	}
-
+	
 	render(ctx: CanvasRenderingContext2D) {
 		ctx.save();
-		ctx.translate(Math.round(this.x), Math.round(this.y));
+		
+		if(this.smooth) {
+			ctx.translate(Math.round(this.x), Math.round(this.y));
+		} else {
+			ctx.translate(Math.round(this.xx) * this.scl, Math.round(this.yy) * this.scl);
+		}
+
 		ctx.fillStyle = this.color;
 
 		this.shape.forEach((row, y) => {
@@ -120,6 +91,45 @@ export class Tetromino extends GameObject {
 
 		ctx.restore();
 	}
+
+	collide(): boolean {
+		let collides =
+			this.y + this.height * this.scl + this.whitespaceTop * this.scl >=
+				this.canvasSize.height ||
+			(this.x + this.whitespaceLeft * this.scl < 0 ||
+				this.x + (this.width - this.whitespaceRight) * this.scl >
+					this.canvasSize.width);
+
+		// Have to check both floored and ceiled values to ensure you arent
+		// halfway into a block
+		const xxf = Math.round(this.x / this.scl);
+		const xxc = Math.round(this.x / this.scl);
+
+		const yyc = Math.ceil(this.y / this.scl);
+		const yyf = Math.floor(this.y / this.scl);
+
+		for (let y = 0; y < this.shape.length; y++) {
+			for (let x = 0; x < this.shape[y].length; x++) {
+				const arena = this.arena.matrix;
+				if (
+					this.shape[y][x] !== 0 &&
+					// Row exists
+					arena[this.yy + y] &&
+					(arena[this.yy + y][xxf + x] !== 0 ||
+						(arena[yyc + y] &&
+							arena[yyc + y][xxc + x] !== 0) ||
+						(arena[yyc + y] &&
+							arena[yyc + y][xxf + x] !== 0) ||
+						arena[this.yy + y][xxc + x] !== 0)
+					// this.arena[yy + y][this.xx + x] !== 0
+				) {
+					collides = true;
+				}
+			}
+		}
+		return collides;
+	}
+
 
 	rotate(dir = 1) {
 		for (let y = 0; y < this.shape.length; ++y) {
@@ -158,7 +168,7 @@ export class Tetromino extends GameObject {
 		const right = this.keys.get("d") || this.keys.get("arrowright");
 
 		if (down) {
-			this.vel.y = Math.pow(this.verticalSpeed, this.boost);
+			this.vel.y = this.verticalSpeed * this.boost;
 		} else {
 			this.vel.y = this.verticalSpeed;
 		}
@@ -192,7 +202,7 @@ export class Tetromino extends GameObject {
 	}
 
 	get width() {
-		return Math.max(...this.shape.map(row => row.sum()));
+		return this.shape[0].length - (this.whitespaceLeft + this.whitespaceRight);
 	}
 	get height() {
 		let height = this.shape.length;

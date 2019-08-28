@@ -1,12 +1,10 @@
-import { Vector2D, Vector3D } from "../utils/Vector.js"
+import { Vector3D } from "../Utils/Vector.js"
 
 export class Camera {
-	private vel: Vector3D
 	private pos: Vector3D
 
 	constructor(x: number, y: number, z: number) {
 		this.pos = new Vector3D(x, y, z)
-		this.vel = new Vector3D(0, 0, 0)
 	}
 
 	tick(ctx: CanvasRenderingContext2D) {

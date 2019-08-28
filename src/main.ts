@@ -1,11 +1,11 @@
-import { Game } from "../game/Game.js";
-import { Arena } from "../game/Arena.js";
+import { Game } from "./Game/Game.js";
 
 declare global {
 	interface Array<T> {
 		remove(elem: T): Array<T>
 		copy(): Array<T>
 		sum(): number
+		last(): T
 	}
 
 	interface CanvasRenderingContext2D {
@@ -40,6 +40,10 @@ CanvasRenderingContext2D.prototype.fillCircle = function(x: number, y: number, r
 	this.closePath()
 
 	this.fill()
+}
+
+Array.prototype.last = function() {
+	return this[this.length - 1];
 }
 
 Array.prototype.remove = function<T>(this: T[], elem: T) : T[] {

@@ -1,5 +1,3 @@
-import { IPoint } from "./IPoint.js";
-
 export class Vector2D {
 	constructor(public x: number, public y: number) {}
 
@@ -12,29 +10,29 @@ export class Vector2D {
 		this.y = y;
 	}
 
-	add(vec: Vector2D | IPoint): Vector2D { return new Vector2D(this.x + vec.x, this.y + vec.y) }
-	sub(vec: Vector2D | IPoint): Vector2D { return new Vector2D(this.x - vec.x, this.y - vec.y) }
+	add(vec: Vector2D): Vector2D { return new Vector2D(this.x + vec.x, this.y + vec.y) }
+	sub(vec: Vector2D): Vector2D { return new Vector2D(this.x - vec.x, this.y - vec.y) }
 
-	mult(vec: Vector2D | IPoint): Vector2D { return new Vector2D(this.x * vec.x, this.y * vec.y) }
-	div (vec: Vector2D | IPoint): Vector2D { return new Vector2D(this.x / vec.x, this.y / vec.y) }
+	mult(vec: Vector2D): Vector2D { return new Vector2D(this.x * vec.x, this.y * vec.y) }
+	div (vec: Vector2D): Vector2D { return new Vector2D(this.x / vec.x, this.y / vec.y) }
 
 	
-	addVec(vec: Vector2D | IPoint) {
+	addVec(vec: Vector2D) {
 		this.x += vec.x
 		this.y += vec.y
 	}
 
-	subVec(vec: Vector2D | IPoint) {
+	subVec(vec: Vector2D) {
 		this.x -= vec.x
 		this.y -= vec.y
 	}
 	
-	multBy(vec: Vector2D | IPoint) {
+	multBy(vec: Vector2D) {
 		this.x *= vec.x
 		this.y *= vec.y
 	}
 	
-	divBy(vec: Vector2D | IPoint) {
+	divBy(vec: Vector2D) {
 		this.x /= vec.x
 		this.y /= vec.y
 	}

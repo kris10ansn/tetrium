@@ -1,6 +1,5 @@
 import { Arena } from "./Arena.js";
 import { Camera } from "./Camera.js";
-import { ISize } from "../utils/ISize";
 import { Tetromino } from "../GameObjects/Tetromino.js";
 import KeyInput from "./KeyInput.js";
 
@@ -16,7 +15,7 @@ export class Game {
 
 	public scl: number;
 
-	constructor(size: ISize) {
+	constructor(size: { width: number, height: number }) {
 		this.canvas = document.createElement("canvas");
 		this.canvas.width = size.width;
 		this.canvas.height = size.height;

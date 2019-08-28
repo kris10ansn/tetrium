@@ -1,4 +1,4 @@
-import { Vector2D } from "../utils/Vector.js";
+import { Vector2D } from "../Utils/Vector.js";
 
 export abstract class GameObject {
 	pos: Vector2D

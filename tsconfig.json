@@ -5,6 +5,7 @@
     "target": "es2015",
     "esModuleInterop": true,
     "noUnusedLocals": false,
-    "strict": false
+    "strict": false,
+    "rootDir": "src/"
   }
 }
