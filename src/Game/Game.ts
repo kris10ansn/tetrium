@@ -23,6 +23,7 @@ export class Game {
 
 		this.ctx = this.canvas.getContext("2d")!;
 		this.camera = new Camera(0, 0, -1);
+		(<any>window).camera =this.camera; 
 
 		this.scl = this.canvas.width / 10;
 
