@@ -1,7 +1,7 @@
 {
 	"name": "Tetrys (BETA)",
 	"short_name":"Tetrys",
-	"version": "0.1",
+	"version": "0.2",
 	"description": "A modern remake of the classic game.",
 	
 	"browser_action": {
