@@ -1,5 +1,5 @@
 import { GameObject } from "./GameObject.js";
-import { tetrominos } from "../Utils/Tetrominos.js";
+import { tetrominos } from "../Utils/tetrominos.js";
 import KeyInput from "../Game/KeyInput.js";
 import { Arena } from "../Game/Arena.js";
 
@@ -14,28 +14,24 @@ export class Tetromino extends GameObject {
 	private rotateDelay = 10;
 	private rotateTimer = 0;
 
-	private smooth: boolean = true;
-
 	constructor(
 		x: number,
 		y: number,
 		private scl: number,
-		private canvasSize: { width: number, height: number },
+		private canvasSize: { width: number; height: number },
 		private arena: Arena,
-		private keyboard: KeyInput
+		private keyboard: KeyInput,
+		private smooth: boolean
 	) {
 		super(x, y);
 
-		this.vel.set(0, 3);
-		
+		this.vel.set(0, this.verticalSpeed);
+
+		// const index = 2;
 		const index = Math.floor(Math.random() * tetrominos.length);
-		// const index = 5;
 		const tetromino = tetrominos[index];
 		this.shape = tetromino.matrix.copy();
 		this.color = tetromino.color;
-
-		// For debugging
-		(<any>window).tetromino = this;
 	}
 
 	tick() {
@@ -55,7 +51,8 @@ export class Tetromino extends GameObject {
 
 		this.x = Math.min(
 			this.x,
-			this.canvasSize.width - (this.width + this.whitespaceLeft) * this.scl
+			this.canvasSize.width -
+				(this.width + this.whitespaceLeft) * this.scl
 		);
 		this.x = Math.max(this.x, -this.whitespaceLeft * this.scl);
 
@@ -64,15 +61,19 @@ export class Tetromino extends GameObject {
 
 		if (this.rotateTimer > 0) this.rotateTimer -= 1;
 	}
-	
+
 	render(ctx: CanvasRenderingContext2D) {
-		ctx.save();
-		
-		if(this.smooth) {
-			ctx.translate(Math.round(this.x), Math.round(this.y));
+		// ctx.save();
+		let translate = { x: null, y: null };
+		if (this.smooth) {
+			translate.x = Math.round(this.x);
+			translate.y = Math.round(this.y);
 		} else {
-			ctx.translate(Math.round(this.xx) * this.scl, Math.round(this.yy) * this.scl);
+			translate.x = Math.round(this.xx) * this.scl;
+			translate.y = Math.round(this.yy) * this.scl;
 		}
+
+		ctx.translate(translate.x, translate.y);
 
 		ctx.fillStyle = this.color;
 
@@ -88,8 +89,9 @@ export class Tetromino extends GameObject {
 				}
 			});
 		});
-
-		ctx.restore();
+		// Couldnt do ctx.save/restore as that is already
+		// done in the Game class's render function
+		ctx.translate(-translate.x, -translate.y);
 	}
 
 	collide(): boolean {
@@ -102,11 +104,8 @@ export class Tetromino extends GameObject {
 
 		// Have to check both floored and ceiled values to ensure you arent
 		// halfway into a block
-		const xxf = Math.round(this.x / this.scl);
-		const xxc = Math.round(this.x / this.scl);
 
 		const yyc = Math.ceil(this.y / this.scl);
-		const yyf = Math.floor(this.y / this.scl);
 
 		for (let y = 0; y < this.shape.length; y++) {
 			for (let x = 0; x < this.shape[y].length; x++) {
@@ -115,12 +114,8 @@ export class Tetromino extends GameObject {
 					this.shape[y][x] !== 0 &&
 					// Row exists
 					arena[this.yy + y] &&
-					(arena[this.yy + y][xxf + x] !== 0 ||
-						(arena[yyc + y] &&
-							arena[yyc + y][xxc + x] !== 0) ||
-						(arena[yyc + y] &&
-							arena[yyc + y][xxf + x] !== 0) ||
-						arena[this.yy + y][xxc + x] !== 0)
+					(arena[this.yy + y][this.xx + x] !== 0 ||
+						(arena[yyc + y] && arena[yyc + y][this.xx + x] !== 0))
 					// this.arena[yy + y][this.xx + x] !== 0
 				) {
 					collides = true;
@@ -129,7 +124,6 @@ export class Tetromino extends GameObject {
 		}
 		return collides;
 	}
-
 
 	rotate(dir = 1) {
 		for (let y = 0; y < this.shape.length; ++y) {
@@ -173,17 +167,33 @@ export class Tetromino extends GameObject {
 			this.vel.y = this.verticalSpeed;
 		}
 
-		if (left) {
-			this.vel.x = -this.horizontalSpeed;
-		} else if (right) {
-			this.vel.x = this.horizontalSpeed;
-		} else {
-			// Distance to perfect tile placement
-			const v = Math.round((this.xx * this.scl - this.x) / 3);
+		if (left || right) {
+			const dir = left ? -1 : 1;
+			let allow = true;
 
-			// If the distance to the destination is less than .5 pixels
-			// just jump directly to the destination
-			this.vel.x = v === 0 ? this.xx * this.scl - this.x : v;
+			if(this.smooth) {
+				this.shape.forEach((row, y) => {
+					row.forEach((value, x) => {
+						// Set allow to false if there is a block in the way.
+						// (Prevents sliding halfway into blocks in smooth mode)
+						if (
+							value === 1 &&
+							this.arena.matrix[this.yy + y] &&
+							this.arena.matrix[this.yy + y][this.xx + x + dir] > 0
+						) {
+							allow = false;
+						}
+					});
+				});
+			}
+
+			if(allow) {
+				this.vel.x = this.horizontalSpeed * dir;
+			} else {
+				this.slideToTile();
+			}
+		} else {
+			this.slideToTile();
 		}
 
 		if (up) {
@@ -194,6 +204,15 @@ export class Tetromino extends GameObject {
 		}
 	}
 
+	slideToTile() {
+		// Distance to perfect tile placement
+		const v = Math.round((this.xx * this.scl - this.x) / 3);
+
+		// If the distance to the destination is less than .5 pixels
+		// just jump directly to the destination
+		this.vel.x = v === 0 ? this.xx * this.scl - this.x : v;
+	}
+
 	get xx() {
 		return Math.round(this.x / this.scl);
 	}
@@ -202,7 +221,9 @@ export class Tetromino extends GameObject {
 	}
 
 	get width() {
-		return this.shape[0].length - (this.whitespaceLeft + this.whitespaceRight);
+		return (
+			this.shape[0].length - (this.whitespaceLeft + this.whitespaceRight)
+		);
 	}
 	get height() {
 		let height = this.shape.length;

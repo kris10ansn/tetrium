@@ -15,6 +15,8 @@ export class Game {
 
 	public scl: number;
 
+	public smooth = true;
+
 	constructor(size: { width: number, height: number }) {
 		this.canvas = document.createElement("canvas");
 		this.canvas.width = size.width;
@@ -23,7 +25,7 @@ export class Game {
 
 		this.ctx = this.canvas.getContext("2d")!;
 		this.camera = new Camera(0, 0, -1);
-		(<any>window).camera =this.camera; 
+		// (<any>window).camera =this.camera;
 
 		this.scl = this.canvas.width / 10;
 
@@ -87,7 +89,8 @@ export class Game {
 			this.scl,
 			{ width: this.canvas.width, height: this.canvas.height },
 			this.arena,
-			this.keyboard
+			this.keyboard,
+			this.smooth
 		);
 	}
 }

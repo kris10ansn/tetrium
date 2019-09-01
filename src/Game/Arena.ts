@@ -9,6 +9,7 @@ export class Arena {
 	
 	private objects = Array<GameObject>();
 	private offset = 0;
+	private yv = 0;
 	private break = null;
 
 	constructor(width: number, height: number, private game: Game) {
@@ -20,16 +21,23 @@ export class Arena {
 			object.tick();
 		});
 
-		for(let i = this.matrix.length-1; i >= 0; i--) {
-			if(this.matrix[i].every(val => val > 0)) {
-				this.clearLine(i);
-				break;
+		let done = false;
+		while(!done) {
+			for(let i = this.matrix.length-1; i >= 0; i--) {
+				if(i === this.matrix.length-1) {
+					done = true;
+				}
+				if(this.matrix[i].every(val => val > 0)) {
+					this.clearLine(i);
+					break;
+				}
 			}
 		}
 
 		// Increment if less than 0
-		this.offset = Math.min(0, this.offset + 6.5);
+		this.offset = Math.min(0, this.offset + this.yv);
 		this.break = this.offset === 0? null : this.break;
+		this.yv = this.offset === 0? 0 : this.yv;
  	}
 
 	public render(ctx: CanvasRenderingContext2D) {
@@ -66,9 +74,17 @@ export class Arena {
 		this.matrix.splice(i, 1);
 		const row = new Array(this.matrix[0].length).fill(0);
 		this.matrix.unshift(row);
-		this.offset -= this.game.scl;
-		// Make break where blocks will fall right below where the row got cleared
-		this.break = i+1;
+
+		if(this.game.smooth) {
+			this.offset -= this.game.scl;
+			this.break = i+1;
+
+			if(this.yv === 0) {
+				this.yv += 4;
+			} else {
+				this.yv += 1.5;
+			}
+		}
 	}
 
 	public addObject(object: GameObject) {
