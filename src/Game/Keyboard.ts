@@ -1,4 +1,4 @@
-export default class KeyInput {
+export class Keyboard {
 	public keys = new Map<string, boolean>()
 
 	constructor() {

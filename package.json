@@ -1,0 +1,30 @@
+{
+  "name": "tetrys",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "live-server": "live-server . --no-browser --watch=js,index.html",
+    "ts:compile": "tsc && node rewritePaths.js",
+    "ts:watch": "nodemon -e ts  --exec \"npm run ts:compile\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kris10ansn/tetrys.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kris10ansn/tetrys/issues"
+  },
+  "homepage": "https://github.com/kris10ansn/tetrys#readme",
+  "devDependencies": {
+    "filehound": "^1.17.3",
+    "ts-loader": "^6.0.4",
+    "typescript": "^3.6.2",
+    "webpack": "^4.39.3",
+    "webpack-cli": "^3.3.7"
+  }
+}

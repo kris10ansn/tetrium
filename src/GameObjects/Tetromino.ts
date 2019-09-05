@@ -1,7 +1,7 @@
-import { GameObject } from "./GameObject.js";
-import { tetrominos } from "../Utils/tetrominos.js";
-import KeyInput from "../Game/KeyInput.js";
-import { Arena } from "../Game/Arena.js";
+import { GameObject } from "./GameObject";
+import { tetrominos } from "../Utils/tetrominos";
+import { Keyboard } from "../Game/Keyboard";
+import { Arena } from "../Game/Arena";
 
 export class Tetromino extends GameObject {
 	public shape: number[][];
@@ -20,7 +20,7 @@ export class Tetromino extends GameObject {
 		private scl: number,
 		private canvasSize: { width: number; height: number },
 		private arena: Arena,
-		private keyboard: KeyInput,
+		private keyboard: Keyboard,
 		private smooth: boolean
 	) {
 		super(x, y);
@@ -34,7 +34,7 @@ export class Tetromino extends GameObject {
 		this.color = tetromino.color;
 	}
 
-	tick() {
+	public tick() {
 		this.handleKeys();
 
 		this.y += this.vel.y;
@@ -62,7 +62,7 @@ export class Tetromino extends GameObject {
 		if (this.rotateTimer > 0) this.rotateTimer -= 1;
 	}
 
-	render(ctx: CanvasRenderingContext2D) {
+	public render(ctx: CanvasRenderingContext2D) {
 		// ctx.save();
 		let translate = { x: null, y: null };
 		if (this.smooth) {
@@ -94,7 +94,7 @@ export class Tetromino extends GameObject {
 		ctx.translate(-translate.x, -translate.y);
 	}
 
-	collide(): boolean {
+	private collide(): boolean {
 		let collides =
 			this.y + this.height * this.scl + this.whitespaceTop * this.scl >=
 				this.canvasSize.height ||
@@ -125,7 +125,7 @@ export class Tetromino extends GameObject {
 		return collides;
 	}
 
-	rotate(dir = 1) {
+	private rotate(dir = 1) {
 		for (let y = 0; y < this.shape.length; ++y) {
 			for (let x = 0; x < y; ++x) {
 				[this.shape[x][y], this.shape[y][x]] = [
@@ -155,7 +155,7 @@ export class Tetromino extends GameObject {
 		}
 	}
 
-	handleKeys() {
+	private handleKeys() {
 		const up = this.keys.get("w") || this.keys.get("arrowup");
 		const left = this.keys.get("a") || this.keys.get("arrowleft");
 		const down = this.keys.get("s") || this.keys.get("arrowdown");
@@ -204,7 +204,7 @@ export class Tetromino extends GameObject {
 		}
 	}
 
-	slideToTile() {
+	private slideToTile() {
 		// Distance to perfect tile placement
 		const v = Math.round((this.xx * this.scl - this.x) / 3);
 

@@ -1,3 +1,8 @@
+out/
+prod/
 dist/
-*.zip
+js/
+node_modules/
+zips/
+package-lock.json
 manifest.json

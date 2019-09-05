@@ -1,4 +1,4 @@
-import { Vector2D } from "../Utils/Vector.js";
+import { Vector2D } from "../Utils/Vector";
 
 export abstract class GameObject {
 	protected pos: Vector2D
@@ -13,8 +13,6 @@ export abstract class GameObject {
 
 	abstract tick()	: void
 	abstract render(ctx: CanvasRenderingContext2D) : void
-
-	getClass() : string { return this.constructor.name }
 
 	get x() { return this.pos.x }
 	get y() { return this.pos.y }

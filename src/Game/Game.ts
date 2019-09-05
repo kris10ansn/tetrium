@@ -1,7 +1,9 @@
-import { Arena } from "./Arena.js";
-import { Camera } from "./Camera.js";
-import { Tetromino } from "../GameObjects/Tetromino.js";
-import KeyInput from "./KeyInput.js";
+import { Arena } from "./Arena";
+import { Camera } from "./Camera";
+import { Tetromino } from "../GameObjects/Tetromino";
+import { Keyboard } from "./Keyboard";
+import { Mouse } from "./Mouse";
+import { GUI } from "../GUI/GUI";
 
 export class Game {
 	private ctx: CanvasRenderingContext2D;
@@ -9,12 +11,14 @@ export class Game {
 
 	private arena: Arena;
 	private camera: Camera;
-	private keyboard: KeyInput;
+	private keyboard: Keyboard;
+	private mouse: Mouse;
+	private gui: GUI;
 
 	private backgroundColor: string = "black";
+	private paused: boolean = false;
 
 	public scl: number;
-
 	public smooth = true;
 
 	constructor(size: { width: number, height: number }) {
@@ -25,11 +29,14 @@ export class Game {
 
 		this.ctx = this.canvas.getContext("2d")!;
 		this.camera = new Camera(0, 0, -1);
-		// (<any>window).camera =this.camera;
 
 		this.scl = this.canvas.width / 10;
 
-		this.keyboard = new KeyInput();
+		this.keyboard = new Keyboard();
+		this.mouse = new Mouse(this.canvas);
+
+		this.gui = new GUI(this, this.mouse);
+
 		this.arena = new Arena(
 			this.canvas.width / this.scl,
 			this.canvas.height / this.scl,
@@ -40,10 +47,10 @@ export class Game {
 		this.loop(0);
 	}
 
-	loop(millis: number) {
+	private loop(millis: number) {
+		const step = 1 / 60;
 		let lastTime: number | null = null;
 		let accumulator = 0;
-		const step = 1 / 60;
 
 		const callback = (millis?: number) => {
 			if (lastTime && millis) {
@@ -64,11 +71,13 @@ export class Game {
 		callback();
 	}
 
-	tick() {
-		this.arena.tick();
+	public tick() {
+		if(this.paused === false) {
+			this.arena.tick();
+		}
 	}
 
-	render() {
+	public render() {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 		this.ctx.save();
@@ -80,9 +89,19 @@ export class Game {
 		this.arena.render(this.ctx);
 
 		this.ctx.restore();
+
+		this.gui.render(this.ctx);
 	}
 
-	generateTetromino() {
+	public pause() {
+		this.paused = true;
+	}
+
+	public resume() {
+		this.paused = false;
+	}
+
+	public generateTetromino() {
 		return new Tetromino(
 			3 * this.scl,
 			-4 * this.scl,

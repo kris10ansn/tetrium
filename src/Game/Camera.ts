@@ -1,4 +1,4 @@
-import { Vector3D } from "../Utils/Vector.js"
+import { Vector3D } from "../Utils/Vector"
 
 export class Camera {
 	private pos: Vector3D

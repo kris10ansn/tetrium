@@ -1,8 +1,8 @@
-import { GameObject } from "../GameObjects/GameObject.js";
-import { Tetromino } from "../GameObjects/Tetromino.js";
-import Matrix from "../Utils/Matrix.js";
-import { Game } from "./Game.js";
-import { Color } from "../Utils/Color.js"
+import { GameObject } from "../GameObjects/GameObject";
+import { Tetromino } from "../GameObjects/Tetromino";
+import Matrix from "../Utils/Matrix";
+import { Game } from "./Game";
+import { Color } from "../Utils/Color"
 
 export class Arena {
 	public matrix: Matrix<number>;

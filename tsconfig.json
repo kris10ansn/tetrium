@@ -1,7 +1,10 @@
 {
-  "compileOnSave": true,
+  // npm run ts:watch instead of compileOnSave
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  "compileOnSave": false,
+
   "compilerOptions": {
-    "outDir": "dist/",
+    "outDir": "js/",
     "target": "es2015",
     "esModuleInterop": true,
     "noUnusedLocals": false,
