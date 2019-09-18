@@ -1,22 +1,18 @@
 import { Button } from "./Button";
 import { Mouse } from "../Game/Mouse";
+import { ImageReference } from "./ImageReference";
 
 export class ImageButton extends Button {
-	public image: HTMLImageElement;
-
 	constructor(
 		x: number,
 		y: number,
 		width: number,
 		height: number,
 		mouse: Mouse,
-		imagePath: string,
+		public imageRef: ImageReference,
 		onclick: (event: MouseEvent) => any,
 	) {
 		super(x, y, width, height, mouse, onclick);
-
-		this.image = new Image();
-		this.image.src = imagePath;
 	}
 
 	public tick(): void {}
@@ -30,16 +26,6 @@ export class ImageButton extends Button {
 			ctx.globalAlpha = 1;
 		}
 
-		ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+		ctx.drawImage(this.imageRef.image, this.x, this.y, this.width, this.height);
 	}
-
-	get x() { return this.bounds.x }
-	get y() { return this.bounds.y }
-	get width() { return this.bounds.width }
-	get height() { return this.bounds.height }
-
-	set x(value) { this.bounds.x = value }
-	set y(value) { this.bounds.y = value }
-	set width(value) { this.bounds.width = value }
-	set height(value) { this.bounds.height = value }
 }

@@ -4,10 +4,11 @@ import { Tetromino } from "../GameObjects/Tetromino";
 import { Keyboard } from "./Keyboard";
 import { Mouse } from "./Mouse";
 import { GUI } from "../GUI/GUI";
+import { StorageHandler } from "../Utils/StorageHandler";
 
 export class Game {
+	public canvas: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
-	private canvas: HTMLCanvasElement;
 
 	private arena: Arena;
 	private camera: Camera;
@@ -21,7 +22,12 @@ export class Game {
 	public scl: number;
 	public smooth = true;
 
-	constructor(size: { width: number, height: number }) {
+	public storage = new StorageHandler();
+
+	private _score: number = 0;
+	private _highscore: number = this.storage.getItem("hscore") || 0;
+
+	constructor(size: { width: number; height: number }) {
 		this.canvas = document.createElement("canvas");
 		this.canvas.width = size.width;
 		this.canvas.height = size.height;
@@ -42,7 +48,18 @@ export class Game {
 			this.canvas.height / this.scl,
 			this
 		);
-		this.arena.addObject(this.generateTetromino());
+
+		const state = this.storage.getItem("state");
+		const x = state && state.tetromino? state.tetromino.x : null;
+		const y = state && state.tetromino? state.tetromino.y : null;
+		const shape = state && state.tetromino? state.tetromino.shapeIndex : null;
+		const rotation = state && state.tetromino? state.tetromino.rotation : null;
+
+		this.arena.addObject(
+			this.generateTetromino(x, y, { shapeIndex: shape, rotation: rotation })
+		);
+
+		this._score = state && state.score? state.score : 0;
 
 		this.loop(0);
 	}
@@ -72,9 +89,15 @@ export class Game {
 	}
 
 	public tick() {
-		if(this.paused === false) {
+		if (this.paused === false) {
 			this.arena.tick();
 		}
+
+		if (this.score > this.highscore) {
+			this.highscore = this.score;
+		}
+
+		this.gui.tick();
 	}
 
 	public render() {
@@ -93,6 +116,10 @@ export class Game {
 		this.gui.render(this.ctx);
 	}
 
+	public die() {
+		this.pause();
+	}
+
 	public pause() {
 		this.paused = true;
 	}
@@ -101,15 +128,57 @@ export class Game {
 		this.paused = false;
 	}
 
-	public generateTetromino() {
+	public restart() {
+		// Prevents objects from ticking and thereby updating state.
+		this.pause();
+
+		this.clearState();
+		window.location.reload();
+	}
+
+	public generateTetromino(
+		x?: number,
+		y?: number,
+		options?: { shapeIndex?: number; rotation?: number }
+	) {
 		return new Tetromino(
-			3 * this.scl,
-			-4 * this.scl,
+			x == null? 3 * this.scl : x,
+			y == null? -4 * this.scl : y,
 			this.scl,
 			{ width: this.canvas.width, height: this.canvas.height },
 			this.arena,
 			this.keyboard,
-			this.smooth
+			this,
+			this.smooth,
+			options || {}
 		);
+	}
+
+	public clearState() {
+		this.storage.setItem("state", {});
+	}
+
+	public get score() {
+		return this._score;
+	}
+
+	public set score(value) {
+		this._score = value;
+
+		this.storage.setItem(
+			"state",
+			Object.assign(this.storage.getItem("state") || {}, {
+				score: value
+			})
+		);
+	}
+
+	public get highscore() {
+		return this._highscore;
+	}
+
+	public set highscore(value) {
+		this._highscore = value;
+		this.storage.setItem("hscore", this._highscore);
 	}
 }

@@ -1,7 +1,7 @@
-import { InteractiveGUIElement } from "./InteractiveGUIElement";
+import { InteractiveWidget } from "./InteractiveWidget";
 import { Mouse } from "../Game/Mouse";
 
-export abstract class Button extends InteractiveGUIElement {
+export abstract class Button extends InteractiveWidget {
 	constructor(
 		x: number,
 		y: number,

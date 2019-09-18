@@ -1,5 +1,6 @@
 export class Keyboard {
 	public keys = new Map<string, boolean>()
+	public onKeyPressFunctions = new Array<(event: KeyboardEvent) => any>();
 
 	constructor() {
 		const keyEvent = (event: KeyboardEvent) => {
@@ -11,5 +12,11 @@ export class Keyboard {
 
 		window.addEventListener("keydown", keyEvent)
 		window.addEventListener("keyup", keyEvent)
+	}
+	
+	public onKeyPress(callback: (event: KeyboardEvent) => any) {
+		this.onKeyPressFunctions.push(callback);
+		const event = new KeyboardEvent("mousemove", );
+		callback(event);
 	}
 }

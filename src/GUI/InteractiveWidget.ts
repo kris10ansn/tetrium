@@ -1,9 +1,8 @@
-import { GUIElement } from "./GUIElement";
+import { Widget as Widget } from "./Widget";
 import { Rectangle } from "../Utils/Rectangle";
 import { Mouse } from "../Game/Mouse";
 
-export abstract class InteractiveGUIElement extends GUIElement {
-	public visible: boolean;
+export abstract class InteractiveWidget extends Widget {
 	public bounds: Rectangle;
 
 	protected hover: boolean = false;

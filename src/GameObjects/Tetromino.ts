@@ -1,11 +1,15 @@
 import { GameObject } from "./GameObject";
-import { tetrominos } from "../Utils/tetrominos";
+import { tetrominos } from "./tetrominos";
 import { Keyboard } from "../Game/Keyboard";
 import { Arena } from "../Game/Arena";
+import { Game } from "../Game/Game";
 
 export class Tetromino extends GameObject {
 	public shape: number[][];
 	public color: string;
+
+	private shapeIndex: number;
+	private rotation: number = 0;
 
 	private verticalSpeed = 3;
 	private boost = 7;
@@ -21,27 +25,38 @@ export class Tetromino extends GameObject {
 		private canvasSize: { width: number; height: number },
 		private arena: Arena,
 		private keyboard: Keyboard,
-		private smooth: boolean
+		private game: Game,
+		private smooth: boolean,
+		options?: { shapeIndex?: number, rotation?: number }
 	) {
 		super(x, y);
 
 		this.vel.set(0, this.verticalSpeed);
 
-		// const index = 2;
-		const index = Math.floor(Math.random() * tetrominos.length);
-		const tetromino = tetrominos[index];
+		this.shapeIndex = options.shapeIndex || Math.floor(Math.random() * tetrominos.length);
+		const tetromino = tetrominos[this.shapeIndex];
 		this.shape = tetromino.matrix.copy();
 		this.color = tetromino.color;
+
+		this.setRotation(options.rotation || 0);
 	}
 
 	public tick() {
 		this.handleKeys();
 
+		const prevyy = this.yy;
 		this.y += this.vel.y;
 		if (this.collide()) {
 			this.y -= this.vel.y;
 			this.y = this.yy * this.scl;
 			this.arena.merge(this);
+			this.game.score += 10;
+		}
+		if (
+			this.yy > prevyy &&
+			this.vel.y === this.verticalSpeed * this.boost /* if boosting */
+		) {
+			this.game.score += 1;
 		}
 
 		this.x += this.vel.x;
@@ -60,6 +75,8 @@ export class Tetromino extends GameObject {
 		// *Move until not colliding*
 
 		if (this.rotateTimer > 0) this.rotateTimer -= 1;
+
+		this.updateState();
 	}
 
 	public render(ctx: CanvasRenderingContext2D) {
@@ -102,9 +119,6 @@ export class Tetromino extends GameObject {
 				this.x + (this.width - this.whitespaceRight) * this.scl >
 					this.canvasSize.width);
 
-		// Have to check both floored and ceiled values to ensure you arent
-		// halfway into a block
-
 		const yyc = Math.ceil(this.y / this.scl);
 
 		for (let y = 0; y < this.shape.length; y++) {
@@ -116,13 +130,26 @@ export class Tetromino extends GameObject {
 					arena[this.yy + y] &&
 					(arena[this.yy + y][this.xx + x] !== 0 ||
 						(arena[yyc + y] && arena[yyc + y][this.xx + x] !== 0))
-					// this.arena[yy + y][this.xx + x] !== 0
 				) {
 					collides = true;
 				}
 			}
 		}
 		return collides;
+	}
+
+	private updateState() {
+		this.game.storage.setItem(
+			"state",
+			Object.assign(this.game.storage.getItem("state") || {}, {
+				tetromino: {
+					x: this.x,
+					y: this.y,
+					shapeIndex: this.shapeIndex,
+					rotation: this.rotation
+				}
+			})
+		);
 	}
 
 	private rotate(dir = 1) {
@@ -153,6 +180,9 @@ export class Tetromino extends GameObject {
 				return;
 			}
 		}
+
+		this.rotation += dir;
+		if(this.rotation > 3) this.rotation = 0;
 	}
 
 	private handleKeys() {
@@ -171,7 +201,7 @@ export class Tetromino extends GameObject {
 			const dir = left ? -1 : 1;
 			let allow = true;
 
-			if(this.smooth) {
+			if (this.smooth) {
 				this.shape.forEach((row, y) => {
 					row.forEach((value, x) => {
 						// Set allow to false if there is a block in the way.
@@ -179,7 +209,8 @@ export class Tetromino extends GameObject {
 						if (
 							value === 1 &&
 							this.arena.matrix[this.yy + y] &&
-							this.arena.matrix[this.yy + y][this.xx + x + dir] > 0
+							this.arena.matrix[this.yy + y][this.xx + x + dir] >
+								0
 						) {
 							allow = false;
 						}
@@ -187,7 +218,7 @@ export class Tetromino extends GameObject {
 				});
 			}
 
-			if(allow) {
+			if (allow) {
 				this.vel.x = this.horizontalSpeed * dir;
 			} else {
 				this.slideToTile();
@@ -211,6 +242,15 @@ export class Tetromino extends GameObject {
 		// If the distance to the destination is less than .5 pixels
 		// just jump directly to the destination
 		this.vel.x = v === 0 ? this.xx * this.scl - this.x : v;
+	}
+
+	private setRotation(value) {
+		let i = 0;
+		while(this.rotation !== value) {
+			if(i >= 4) return;
+			this.rotate(1);
+			i++
+		}
 	}
 
 	get xx() {

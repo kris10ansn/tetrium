@@ -1,11 +1,14 @@
 import { Vector2D } from "../Utils/Vector";
 
 export class Mouse {
-	private pos = new Vector2D(-Infinity, -Infinity);
+	private pos = new Vector2D(-0, -0);
 	private onMoveFunctions = new Array<(event: MouseEvent) => any>();
 	private onClickFunctions = new Array<(event: MouseEvent) => any>();
 
 	constructor(canvas: HTMLCanvasElement) {
+		this.x = sessionStorage.mouseX? Number(sessionStorage.mouseX) : this.x;
+		this.y = sessionStorage.mouseY? Number(sessionStorage.mouseY) : this.y;
+
 		const computedStyle = window.getComputedStyle(canvas);
 		const cwidth = parseInt(computedStyle.width);
 		const cheight = parseInt(computedStyle.height);
@@ -29,6 +32,8 @@ export class Mouse {
 
 	public onMove(callback: (event: MouseEvent) => any) {
 		this.onMoveFunctions.push(callback);
+		const event = new MouseEvent("mousemove", { clientX: this.x, clientY: this.y });
+		callback(event);
 	}
 	public onClick(callback: (event: MouseEvent) => any) {
 		this.onClickFunctions.push(callback);
@@ -37,6 +42,12 @@ export class Mouse {
 	public get x() { return this.pos.x }
 	public get y() { return this.pos.y }
 
-	public set x(val) { this.pos.x = val }
-	public set y(val) { this.pos.y = val }
+	public set x(val) {
+		this.pos.x = val
+		sessionStorage.mouseX = val;
+	}
+	public set y(val) {
+		this.pos.y = val
+		sessionStorage.mouseY = val;
+	}
 }

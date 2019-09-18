@@ -54,9 +54,6 @@ CanvasRenderingContext2D.prototype.fillRoundedRect = function(
 		height-radius
 	);
 
-	this.stroke();
-	this.fill();
-
 	this.lineJoin = lineJoin;
 };
 

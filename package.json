@@ -1,12 +1,17 @@
 {
   "name": "tetrys",
-  "version": "1.0.0",
+  "version": "0.4.0",
   "description": "",
   "private": true,
   "scripts": {
-    "build": "webpack --config webpack.config.js",
+    "publish": "npm run build && npm run zip",
+    "build": "npm run webpack && npm run updateHTML",
+    "webpack": "webpack --config webpack.config.js",
+    "zip": "powershell -command Compress-Archive dist/* zips/output.zip",
     "live-server": "live-server . --no-browser --watch=js,index.html",
-    "ts:compile": "tsc && node rewritePaths.js",
+    "updateHTML": "node scripts/updateHTML.js",
+    "rewritePaths": "node scripts/rewritePaths.js",
+    "ts:compile": "tsc && npm run rewritePaths",
     "ts:watch": "nodemon -e ts  --exec \"npm run ts:compile\""
   },
   "repository": {
@@ -22,6 +27,7 @@
   "homepage": "https://github.com/kris10ansn/tetrys#readme",
   "devDependencies": {
     "filehound": "^1.17.3",
+    "jsdom": "^15.1.1",
     "ts-loader": "^6.0.4",
     "typescript": "^3.6.2",
     "webpack": "^4.39.3",

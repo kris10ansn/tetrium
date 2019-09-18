@@ -8,14 +8,14 @@ const fs = require("fs");
 const path = require("path");
 
 const files = FileHound.create()
-	.paths(__dirname + "/js")
+	.paths(path.join(__dirname, "..", "js"))
 	.ext("js")
 	.find();
 
 files.then(filePaths => {
 	filePaths.forEach(filepath => {
 		fs.readFile(filepath, "utf8", (err, data) => {
-			if (!data.match(/import .* from/g)) {
+			if (!(data.match(/import .* from/g) || data.match(/\.\/assets/g))) {
 				return;
 			}
 			const newData = data
