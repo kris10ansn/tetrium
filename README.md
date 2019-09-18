@@ -2,7 +2,11 @@
 
 This is not the code for my chrome extension (yet). This is a new version im working on. I made the extension when i was a beginner at programming, and therefore the code is really bad. When i get done this version will replace the old one.
 
-## Versions
+## Log
+
+### 0.5.0
+- Added saved state (score, tetromino position and arena) for when you reopen the game again.
+- Added death system for when you go over the height limit
 
 ### 0.4.0
 - Point system added
