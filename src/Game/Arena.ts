@@ -132,6 +132,7 @@ export class Arena {
 		for(let i = 0; i < 4; i++) {
 			if(this.matrix[i].sum() > 0) {
 				this.game.die();
+				return;
 			}
 		}
 	}

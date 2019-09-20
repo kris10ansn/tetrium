@@ -27,6 +27,8 @@ export class Game {
 	private _score: number = 0;
 	private _highscore: number = this.storage.getItem("hscore") || 0;
 
+	private dead = false;
+
 	constructor(size: { width: number; height: number }) {
 		this.canvas = document.createElement("canvas");
 		this.canvas.width = size.width;
@@ -50,16 +52,21 @@ export class Game {
 		);
 
 		const state = this.storage.getItem("state");
-		const x = state && state.tetromino? state.tetromino.x : null;
-		const y = state && state.tetromino? state.tetromino.y : null;
-		const shape = state && state.tetromino? state.tetromino.shapeIndex : null;
-		const rotation = state && state.tetromino? state.tetromino.rotation : null;
+		const x = state && state.tetromino ? state.tetromino.x : null;
+		const y = state && state.tetromino ? state.tetromino.y : null;
+		const shape =
+			state && state.tetromino ? state.tetromino.shapeIndex : null;
+		const rotation =
+			state && state.tetromino ? state.tetromino.rotation : null;
 
 		this.arena.addObject(
-			this.generateTetromino(x, y, { shapeIndex: shape, rotation: rotation })
+			this.generateTetromino(x, y, {
+				shapeIndex: shape,
+				rotation: rotation
+			})
 		);
 
-		this._score = state && state.score? state.score : 0;
+		this._score = state && state.score ? state.score : 0;
 
 		this.loop(0);
 	}
@@ -89,7 +96,7 @@ export class Game {
 	}
 
 	public tick() {
-		if (this.paused === false) {
+		if (!this.paused && !this.dead) {
 			this.arena.tick();
 		}
 
@@ -117,7 +124,9 @@ export class Game {
 	}
 
 	public die() {
-		this.pause();
+		this.dead = true;
+		this.clearState();
+		this.storage.lock();
 	}
 
 	public pause() {
@@ -142,8 +151,8 @@ export class Game {
 		options?: { shapeIndex?: number; rotation?: number }
 	) {
 		return new Tetromino(
-			x == null? 3 * this.scl : x,
-			y == null? -4 * this.scl : y,
+			x == null ? 3 * this.scl : x,
+			y == null ? -4 * this.scl : y,
 			this.scl,
 			{ width: this.canvas.width, height: this.canvas.height },
 			this.arena,
