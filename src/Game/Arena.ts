@@ -1,8 +1,8 @@
 import { GameObject } from "../GameObjects/GameObject";
 import { Tetromino } from "../GameObjects/Tetromino";
-import Matrix from "../Utils/Matrix";
 import { Game } from "./Game";
 import { Color } from "../Utils/Color";
+import Matrix from "../Utils/Matrix";
 
 export class Arena {
 	public matrix: Matrix<number>;
@@ -77,6 +77,8 @@ export class Arena {
 	}
 
 	private clearLine(i: number) {
+		if(this.game.dead) return;
+		
 		this.matrix.splice(i, 1);
 		const row = new Array(this.matrix[0].length).fill(0);
 		this.matrix.unshift(row);

@@ -5,189 +5,217 @@ import { Keyboard } from "./Keyboard";
 import { Mouse } from "./Mouse";
 import { GUI } from "../GUI/GUI";
 import { StorageHandler } from "../Utils/StorageHandler";
+import { Canvas } from "./Canvas";
+import { TextWidget } from "../GUI/TextWidget";
 
 export class Game {
-	public canvas: HTMLCanvasElement;
-	private ctx: CanvasRenderingContext2D;
+  public canvas: Canvas;
 
-	private arena: Arena;
-	private camera: Camera;
-	private keyboard: Keyboard;
-	private mouse: Mouse;
-	private gui: GUI;
+  private arena: Arena;
+  private mouse: Mouse;
+  private gui: GUI;
 
-	private backgroundColor: string = "black";
-	private paused: boolean = false;
+  private keyboard = new Keyboard();
+  private camera = new Camera(0, 0, -1);
 
-	public scl: number;
-	public smooth = true;
+  private backgroundColor: string = "black";
+  private paused: boolean = false;
 
-	public storage = new StorageHandler();
+  public scl: number;
+  public smooth = true;
 
-	private _score: number = 0;
-	private _highscore: number = this.storage.getItem("hscore") || 0;
+  public storage = new StorageHandler();
 
-	private dead = false;
+  private _score: number = 0;
+  private _highscore: number = this.storage.getItem("hscore") || 0;
 
-	constructor(size: { width: number; height: number }) {
-		this.canvas = document.createElement("canvas");
-		this.canvas.width = size.width;
-		this.canvas.height = size.height;
-		document.body.appendChild(this.canvas);
+  public dead = false;
 
-		this.ctx = this.canvas.getContext("2d")!;
-		this.camera = new Camera(0, 0, -1);
+  constructor(size: { width: number; height: number }) {
+    this.canvas = new Canvas(size.width, size.height);
+    this.scl = this.canvas.width / 10;
 
-		this.scl = this.canvas.width / 10;
+    this.mouse = new Mouse(this.canvas.element);
 
-		this.keyboard = new Keyboard();
-		this.mouse = new Mouse(this.canvas);
+    this.gui = new GUI(this, this.mouse);
 
-		this.gui = new GUI(this, this.mouse);
+    this.arena = new Arena(
+      this.canvas.width / this.scl,
+      this.canvas.height / this.scl,
+      this
+    );
 
-		this.arena = new Arena(
-			this.canvas.width / this.scl,
-			this.canvas.height / this.scl,
-			this
-		);
+    const state = this.loadState();
+    const { x, y, shape: shapeIndex, rotation } = state.tetromino;
 
-		const state = this.storage.getItem("state");
-		const x = state && state.tetromino ? state.tetromino.x : null;
-		const y = state && state.tetromino ? state.tetromino.y : null;
-		const shape =
-			state && state.tetromino ? state.tetromino.shapeIndex : null;
-		const rotation =
-			state && state.tetromino ? state.tetromino.rotation : null;
+    this.arena.addObject(
+      this.generateTetromino(x, y, { shapeIndex, rotation })
+    );
 
-		this.arena.addObject(
-			this.generateTetromino(x, y, {
-				shapeIndex: shape,
-				rotation: rotation
-			})
-		);
+    this._score = state.score ? state.score : 0;
 
-		this._score = state && state.score ? state.score : 0;
+    this.keyboard.onKeyPress(event => {
+      if (event.key === " " && !this.keyboard.keys.get(" ")) {
+        this.gui.pauseButton.onClick(
+          new MouseEvent("click", {
+            clientX: this.gui.pauseButton.x,
+            clientY: this.gui.pauseButton.y
+          })
+        );
+      }
+    });
 
-		this.loop(0);
-	}
+    this.loop(0);
+  }
 
-	private loop(millis: number) {
-		const step = 1 / 60;
-		let lastTime: number | null = null;
-		let accumulator = 0;
+  private loop(millis: number) {
+    const step = 1 / 60;
+    let lastTime: number | null = null;
+    let accumulator = 0;
 
-		const callback = (millis?: number) => {
-			if (lastTime && millis) {
-				accumulator += (millis - lastTime) / 1000;
+    const callback = (millis?: number) => {
+      if (lastTime && millis) {
+        accumulator += (millis - lastTime) / 1000;
 
-				while (accumulator > step) {
-					this.tick();
-					accumulator -= step;
-				}
-				this.render();
-			}
+        while (accumulator > step) {
+          this.tick();
+          accumulator -= step;
+        }
+        this.render();
+      }
 
-			if (millis) lastTime = millis;
+      if (millis) lastTime = millis;
 
-			requestAnimationFrame(callback);
-		};
+      requestAnimationFrame(callback);
+    };
 
-		callback();
-	}
+    callback();
+  }
 
-	public tick() {
-		if (!this.paused && !this.dead) {
-			this.arena.tick();
-		}
+  public tick() {
+    if (!this.paused && !this.dead) {
+      this.arena.tick();
+    }
 
-		if (this.score > this.highscore) {
-			this.highscore = this.score;
-		}
+    if (this.score > this.highscore) {
+      this.highscore = this.score;
+    }
 
-		this.gui.tick();
-	}
+    this.gui.tick();
+  }
 
-	public render() {
-		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  public render() {
+    this.canvas.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-		this.ctx.save();
-		this.camera.tick(this.ctx);
+    this.canvas.ctx.save();
+    this.camera.tick(this.canvas.ctx);
 
-		this.ctx.fillStyle = this.backgroundColor;
-		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.canvas.ctx.fillStyle = this.backgroundColor;
+    this.canvas.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-		this.arena.render(this.ctx);
+    this.arena.render(this.canvas.ctx);
 
-		this.ctx.restore();
+    this.canvas.ctx.restore();
 
-		this.gui.render(this.ctx);
-	}
+    this.gui.render(this.canvas.ctx);
+  }
 
-	public die() {
-		this.dead = true;
-		this.clearState();
-		this.storage.lock();
-	}
+  public die() {
+    this.dead = true;
+    this.clearState();
+    this.storage.lock();
 
-	public pause() {
-		this.paused = true;
-	}
+    this.gui.elements.push(
+      new TextWidget(300, 500, "You died", "Arial", 56, "red")
+    );
 
-	public resume() {
-		this.paused = false;
-	}
+    this.keyboard.onKeyPress(event => {
+      const key = event.key.toLowerCase();
+      // If the key was not already down when pressing
+      if (!this.keyboard.keys.get(key)) {
+        this.restart();
+      }
+    });
+  }
 
-	public restart() {
-		// Prevents objects from ticking and thereby updating state.
-		this.pause();
+  public pause() {
+    this.paused = true;
+  }
 
-		this.clearState();
-		window.location.reload();
-	}
+  public resume() {
+    this.paused = false;
+  }
 
-	public generateTetromino(
-		x?: number,
-		y?: number,
-		options?: { shapeIndex?: number; rotation?: number }
-	) {
-		return new Tetromino(
-			x == null ? 3 * this.scl : x,
-			y == null ? -4 * this.scl : y,
-			this.scl,
-			{ width: this.canvas.width, height: this.canvas.height },
-			this.arena,
-			this.keyboard,
-			this,
-			this.smooth,
-			options || {}
-		);
-	}
+  public restart() {
+    // Prevents objects from ticking and thereby updating state.
+    this.pause();
 
-	public clearState() {
-		this.storage.setItem("state", {});
-	}
+    this.clearState();
+    window.location.reload();
+  }
 
-	public get score() {
-		return this._score;
-	}
+  public clearState() {
+    this.storage.setItem("state", {});
+  }
 
-	public set score(value) {
-		this._score = value;
+  public loadState() {
+    const state = this.storage.getItem("state");
+    const score = state && state.score ? state.score : null;
+    const x = state && state.tetromino ? state.tetromino.x : null;
+    const y = state && state.tetromino ? state.tetromino.y : null;
+    const shape = state && state.tetromino ? state.tetromino.shapeIndex : null;
+    const rotation = state && state.tetromino ? state.tetromino.rotation : null;
 
-		this.storage.setItem(
-			"state",
-			Object.assign(this.storage.getItem("state") || {}, {
-				score: value
-			})
-		);
-	}
+    return {
+      score,
+      tetromino: {
+        x,
+        y,
+        shape,
+        rotation
+      }
+    };
+  }
 
-	public get highscore() {
-		return this._highscore;
-	}
+  public generateTetromino(
+    x?: number,
+    y?: number,
+    options?: { shapeIndex?: number; rotation?: number }
+  ) {
+    return new Tetromino(
+      x == null ? 3 * this.scl : x,
+      y == null ? -4 * this.scl : y,
+      this.scl,
+      { width: this.canvas.width, height: this.canvas.height },
+      this.arena,
+      this.keyboard,
+      this,
+      this.smooth,
+      options || {}
+    );
+  }
 
-	public set highscore(value) {
-		this._highscore = value;
-		this.storage.setItem("hscore", this._highscore);
-	}
+  public get score() {
+    return this._score;
+  }
+
+  public set score(value) {
+    this._score = value;
+
+    this.storage.setItem(
+      "state",
+      Object.assign(this.storage.getItem("state") || {}, {
+        score: value
+      })
+    );
+  }
+
+  public get highscore() {
+    return this._highscore;
+  }
+
+  public set highscore(value) {
+    this._highscore = value;
+    this.storage.setItem("hscore", this._highscore);
+  }
 }

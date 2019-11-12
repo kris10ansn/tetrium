@@ -1,11 +1,12 @@
 {
   "name": "tetrys",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "",
   "private": true,
+  "sideEffects": false,
   "scripts": {
     "publish": "npm run build && npm run zip",
-    "build": "npm run webpack && npm run updateHTML",
+    "build": "npm run updateHTML && npm run webpack",
     "webpack": "webpack --config webpack.config.js",
     "zip": "powershell -command Compress-Archive dist/* zips/output.zip",
     "live-server": "live-server . --no-browser --watch=js,index.html",
@@ -26,8 +27,10 @@
   },
   "homepage": "https://github.com/kris10ansn/tetrys#readme",
   "devDependencies": {
+    "css-loader": "^3.2.0",
     "filehound": "^1.17.3",
     "jsdom": "^15.1.1",
+    "style-loader": "^1.0.0",
     "ts-loader": "^6.0.4",
     "typescript": "^3.6.2",
     "webpack": "^4.39.3",

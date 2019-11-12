@@ -16,9 +16,11 @@ export abstract class InteractiveWidget extends Widget {
 	) {
 		super(x, y, width, height);
 
+		this.hover = this.bounds.includes(mouse);
+
 		this.mouse.onMove(event => {
 			this.hover = this.bounds.includes(mouse);
-		})
+		});
 	}
 	
 	public abstract tick(): void;

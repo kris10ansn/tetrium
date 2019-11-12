@@ -22,7 +22,7 @@ export class Mouse {
 			this.x = (event.clientX - rect.left) * mx -5;
 			this.y = (event.clientY - rect.top) * my  -5;
 			
-			this.onMoveFunctions.forEach(it => it(event));
+			this.onMoveFunctions.forEach(callback => callback(event));
 		});
 
 		canvas.addEventListener("click", event => {
@@ -32,8 +32,6 @@ export class Mouse {
 
 	public onMove(callback: (event: MouseEvent) => any) {
 		this.onMoveFunctions.push(callback);
-		const event = new MouseEvent("mousemove", { clientX: this.x, clientY: this.y });
-		callback(event);
 	}
 	public onClick(callback: (event: MouseEvent) => any) {
 		this.onClickFunctions.push(callback);

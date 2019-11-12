@@ -8,7 +8,9 @@ import { ImageReference } from "./ImageReference";
 import { Line } from "./Line";
 
 export class GUI {
-	private elements = new Array<Widget>();
+	public elements = new Array<Widget>();
+
+	public pauseButton: ImageButton;
 
 	constructor(private game: Game, private mouse: Mouse) {
 		const pauseImage = new ImageReference("./assets/images/pause.png");
@@ -17,17 +19,17 @@ export class GUI {
 
 		const resumeEvent = event => {
 			this.game.resume();
-			pauseButton.imageRef = pauseImage;
-			pauseButton.onClick = pauseEvent;
+			this.pauseButton.imageRef = pauseImage;
+			this.pauseButton.onClick = pauseEvent;
 		};
 
 		const pauseEvent = event => {
 			this.game.pause();
-			pauseButton.imageRef = playImage;
-			pauseButton.onClick = resumeEvent;
+			this.pauseButton.imageRef = playImage;
+			this.pauseButton.onClick = resumeEvent;
 		};
 
-		const pauseButton = new ImageButton(
+		this.pauseButton = new ImageButton(
 			475,
 			50,
 			75,
@@ -81,7 +83,7 @@ export class GUI {
 			"red"
 		);
 
-		this.elements.push(pauseButton);
+		this.elements.push(this.pauseButton);
 		this.elements.push(resetButton);
 		this.elements.push(scoreText);
 		this.elements.push(highscoreText);

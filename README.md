@@ -4,8 +4,13 @@ This is not the code for my chrome extension (yet). This is a new version im wor
 
 ## Log
 
+#### 0.5.2
+- You can now press a key to restart when dead
+- Space to pause/play
+- Fixed bug where line would clear even after dying
+
 #### 0.5.1
-- Bud fix: When dead you could previously hit pause and then play to continue playing
+- Bug fix: When dead you could previously hit pause and then play to continue playing
 
 ### 0.5.0
 - Added saved state (score, tetromino position and arena) for when you reopen the game again.
