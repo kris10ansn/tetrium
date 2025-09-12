@@ -17,12 +17,11 @@
 
     "action": {
         "default_icon": {
-            "16": "/icons/icon16.png",
-            "24": "/icons/icon24.png",
-            "32": "/icons/icon32.png",
-            "48": "/icons/icon48.png",
-            "128": "/icons/icon128.png",
-            "256": "/icons/icon256.png"
+            "16": "/assets/logo16x16.png",
+            "32": "/assets/logo32x32.png",
+            "48": "/assets/logo48x48.png",
+            "128": "/assets/logo128x128.png",
+            "256": "/assets/logo256x256.png"
         },
         "default_title": "Tetrium",
         "default_popup": "index.html"
