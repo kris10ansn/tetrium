@@ -6,8 +6,6 @@
         "webpack": "webpack --config webpack.config.js",
         "live-server": "live-server . --no-browser --watch=js,index.html",
         "watch": "webpack -w",
-        "prepublish": "npm run build",
-        "publish": "npm run zip",
         "zip": "zip tetrium-$npm_package_version.zip -r public"
     },
     "author": "kris10ansn",
