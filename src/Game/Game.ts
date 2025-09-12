@@ -68,7 +68,7 @@ export class Game {
     this.loop(0);
   }
 
-  private loop(millis: number) {
+  private loop(_millis: number) {
     const step = 1 / 60;
     let lastTime: number | null = null;
     let accumulator = 0;
