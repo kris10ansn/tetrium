@@ -5,3 +5,5 @@ js/
 node_modules/
 zips/
 package-lock.json
+
+*-bundle.js
