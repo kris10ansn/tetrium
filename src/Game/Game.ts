@@ -7,9 +7,11 @@ import { GUI } from "../GUI/GUI";
 import { StorageHandler } from "../Utils/StorageHandler";
 import { Canvas } from "./Canvas";
 import { TextWidget } from "../GUI/TextWidget";
+import { Bag } from "./Bag";
 
 export class Game {
     private arena: Arena;
+    private bag: Bag;
     private mouse: Mouse;
     private gui: GUI;
 
@@ -35,6 +37,7 @@ export class Game {
         this.gui = new GUI(this, this.mouse);
         this.keyboard = new Keyboard();
         this.camera = new Camera(0, 0, -1);
+        this.bag = new Bag();
 
         this.arena = new Arena(
             this.canvas.width / this.scl,
@@ -46,7 +49,10 @@ export class Game {
         const { x, y, shape: shapeIndex, rotation } = state.tetromino;
 
         this.arena.addObject(
-            this.generateTetromino(x, y, { shapeIndex, rotation }),
+            this.generateTetromino(x, y, {
+                shapeIndex: shapeIndex ?? this.bag.grabIndex(),
+                rotation,
+            }),
         );
 
         this._score = state.score ? state.score : 0;
@@ -192,7 +198,7 @@ export class Game {
             this.keyboard,
             this,
             this.smooth,
-            options ?? {},
+            options ?? { shapeIndex: this.bag.grabIndex() },
         );
     }
 
