@@ -19,7 +19,7 @@ export class Tetromino extends GameObject {
     private rotateDelay = 10;
     private rotateTimer = 0;
 
-    private collisionMemo = new Memo(-1, false);
+    private collisionMemo = new Memo("", false);
 
     constructor(
         x: number,
@@ -118,7 +118,10 @@ export class Tetromino extends GameObject {
     }
 
     private isCollision() {
-        return this.collisionMemo.get(this.yy, this._isCollision.bind(this));
+        return this.collisionMemo.get(
+            `${this.yyc}-${this.xx}`,
+            this._isCollision.bind(this),
+        );
     }
 
     private _isCollision(): boolean {
