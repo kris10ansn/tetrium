@@ -2,7 +2,7 @@ import { GameObject } from "../GameObjects/GameObject";
 import { Tetromino } from "../GameObjects/Tetromino";
 import { Game } from "./Game";
 import { Color } from "../Utils/Color";
-import Matrix from "../Utils/Matrix";
+import { createMatrix, Matrix } from "../Utils/Matrix";
 
 export class Arena {
 	public matrix: Matrix<number>;
@@ -16,7 +16,7 @@ export class Arena {
 
 	constructor(width: number, height: number, private game: Game) {
 		const state = game.storage.getItem("state");
-		this.matrix = state && state.arena? state.arena : Matrix<number>(width, height, 0);
+		this.matrix = state && state.arena? state.arena : createMatrix<number>(width, height, 0);
 	}
 
 	public tick() {

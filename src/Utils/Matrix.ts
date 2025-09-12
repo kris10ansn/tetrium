@@ -1,6 +1,6 @@
-type Matrix<T> = Array<Array<T>>;
+export type Matrix<T> = Array<Array<T>>;
 
-function Matrix<T>(width: number, height: number, fill: T): Matrix<T> {
+export function createMatrix<T>(width: number, height: number, fill: T): Matrix<T> {
 	const array = new Array<Array<T>>()
 
 	while(height--) {
@@ -8,5 +8,3 @@ function Matrix<T>(width: number, height: number, fill: T): Matrix<T> {
 	}
 	return array
 }
-
-export default Matrix;
