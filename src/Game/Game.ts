@@ -9,14 +9,12 @@ import { Canvas } from "./Canvas";
 import { TextWidget } from "../GUI/TextWidget";
 
 export class Game {
-    public canvas: Canvas;
-
     private arena: Arena;
     private mouse: Mouse;
     private gui: GUI;
 
-    private keyboard = new Keyboard();
-    private camera = new Camera(0, 0, -1);
+    private keyboard: Keyboard;
+    private camera: Camera;
 
     private backgroundColor: string = "black";
     private paused: boolean = false;
@@ -31,13 +29,12 @@ export class Game {
 
     public dead = false;
 
-    constructor(size: { width: number; height: number }) {
-        this.canvas = new Canvas(size.width, size.height);
+    constructor(public canvas: Canvas) {
         this.scl = this.canvas.width / 10;
-
         this.mouse = new Mouse(this.canvas.element);
-
         this.gui = new GUI(this, this.mouse);
+        this.keyboard = new Keyboard();
+        this.camera = new Camera(0, 0, -1);
 
         this.arena = new Arena(
             this.canvas.width / this.scl,
@@ -64,11 +61,13 @@ export class Game {
                 );
             }
         });
-
-        this.loop(0);
     }
 
-    private loop(_millis: number) {
+    public start() {
+        this.loop();
+    }
+
+    private loop(_millis: number = 0) {
         const step = 1 / 60;
         let lastTime: number | null = null;
         let accumulator = 0;

@@ -1,10 +1,14 @@
+import { Canvas } from "./Game/Canvas";
 import { Game } from "./Game/Game";
 
 function init() {
-    const game = new Game({
-        width: 600,
-        height: 1080,
-    });
+    const gameDiv = document.body.querySelector("#game");
+
+    const canvas = new Canvas(600, 1080);
+    canvas.render(gameDiv);
+
+    const game = new Game(canvas);
+    game.start();
 }
 
 window.onload = init;

@@ -11,9 +11,12 @@ export class Canvas {
         this.element = document.createElement("canvas");
         this.element.width = width;
         this.element.height = height;
-        document.body.querySelector(".game").appendChild(this.element);
 
         this.ctx = this.element.getContext("2d")!;
+    }
+
+    public render(parentNode: Node) {
+        parentNode.appendChild(this.element);
     }
 
     public set blur(value) {
