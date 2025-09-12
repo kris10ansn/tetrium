@@ -1,31 +1,16 @@
 {
-    "name": "tetrys",
-    "version": "0.5.2",
-    "description": "",
-    "private": true,
-    "sideEffects": false,
+    "name": "tetrium",
+    "version": "1.0.0",
     "scripts": {
-        "publish": "npm run build && npm run zip",
-        "build": "npm run updateHTML && npm run webpack",
+        "build": "npm run webpack",
         "webpack": "webpack --config webpack.config.js",
-        "zip": "powershell -command Compress-Archive dist/* zips/output.zip",
         "live-server": "live-server . --no-browser --watch=js,index.html",
-        "updateHTML": "node scripts/updateHTML.js",
-        "rewritePaths": "node scripts/rewritePaths.js",
-        "ts:compile": "tsc && npm run rewritePaths",
-        "ts:watch": "nodemon -e ts  --exec \"npm run ts:compile\""
+        "watch": "webpack -w",
+        "prepublish": "npm run build",
+        "publish": "npm run zip",
+        "zip": "zip tetrium-$npm_package_version.zip -r public"
     },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/kris10ansn/tetrys.git"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/kris10ansn/tetrys/issues"
-    },
-    "homepage": "https://github.com/kris10ansn/tetrys#readme",
+    "author": "kris10ansn",
     "devDependencies": {
         "css-loader": "^3.2.0",
         "filehound": "^1.17.3",
