@@ -122,14 +122,17 @@ export class Tetromino extends GameObject {
     }
 
     private _isCollision(): boolean {
-        let collides =
+        const collidesBottom =
             this.y + this.height * this.scl + this.whitespaceTop * this.scl >=
-                this.canvasSize.height ||
-            this.x + this.whitespaceLeft * this.scl < 0 ||
+            this.canvasSize.height;
+        const collidesWest = this.x + this.whitespaceLeft * this.scl < 0;
+        const collidesEast =
             this.x + (this.width - this.whitespaceRight) * this.scl >
-                this.canvasSize.width;
+            this.canvasSize.width;
 
-        const yyc = Math.ceil(this.y / this.scl);
+        let collides = collidesBottom || collidesWest || collidesEast;
+
+        if (collides) return collides;
 
         for (let y = 0; y < this.shape.length; y++) {
             for (let x = 0; x < this.shape[y].length; x++) {
@@ -137,9 +140,10 @@ export class Tetromino extends GameObject {
                 if (
                     this.shape[y][x] !== 0 &&
                     // Row exists
-                    arena[this.yy + y] &&
-                    (arena[this.yy + y][this.xx + x] !== 0 ||
-                        (arena[yyc + y] && arena[yyc + y][this.xx + x] !== 0))
+                    arena[this.yyc + y] &&
+                    (arena[this.yyc + y][this.xx + x] !== 0 ||
+                        (arena[this.yyc + y] &&
+                            arena[this.yyc + y][this.xx + x] !== 0))
                 ) {
                     collides = true;
                 }
@@ -268,6 +272,10 @@ export class Tetromino extends GameObject {
     }
     get yy() {
         return Math.round(this.y / this.scl);
+    }
+
+    get yyc() {
+        return Math.ceil(this.y / this.scl);
     }
 
     get width() {
