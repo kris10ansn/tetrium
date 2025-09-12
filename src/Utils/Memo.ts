@@ -4,17 +4,12 @@ export class Memo<K, V> {
         private value: V,
     ) {}
 
-    public get(key, callback) {
+    public get(key: K, callback: Function) {
         if (key !== this.key) {
             this.key = key;
             this.value = callback();
         }
 
         return this.value;
-    }
-
-    public set(key: K, value: V) {
-        this.key = key;
-        this.value = value;
     }
 }
