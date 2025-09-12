@@ -15,10 +15,6 @@
         "256": "/assets/logo256x256.png"
     },
 
-    "background": {
-        "service_worker": "background-bundle.js"
-    },
-
     "action": {
         "default_icon": {
             "16": "/icons/icon16.png",
