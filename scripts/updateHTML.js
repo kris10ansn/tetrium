@@ -19,6 +19,6 @@ styleElement.innerHTML = styles;
 dom.window.document.head.appendChild(styleElement);
 
 fs.writeFileSync(
-  "dist/index_prod.html",
-  dom.window.document.documentElement.outerHTML.replace(/\n|\t/g, "")
+    "dist/index_prod.html",
+    dom.window.document.documentElement.outerHTML.replace(/\n|\t/g, ""),
 );

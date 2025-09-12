@@ -1,30 +1,30 @@
 import { Widget } from "./Widget";
 
 export class Line extends Widget {
-	constructor(
-		x: number,
-		y: number,
-		x2: number,
-		y2: number,
-		private color: string
-	) {
-		super(x, y, x2 - x, y2 - y);
-	}
-	
-	public render(ctx: CanvasRenderingContext2D): void {
-		ctx.fillStyle = "white"
-		ctx.strokeStyle = this.color;
-		ctx.lineWidth = 1;
-		
-		ctx.beginPath();
+    constructor(
+        x: number,
+        y: number,
+        x2: number,
+        y2: number,
+        private color: string,
+    ) {
+        super(x, y, x2 - x, y2 - y);
+    }
 
-		ctx.moveTo(this.x, this.y);
-		ctx.lineTo(this.x + this.width, this.y + this.height);
+    public render(ctx: CanvasRenderingContext2D): void {
+        ctx.fillStyle = "white";
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 1;
 
-		ctx.closePath();
+        ctx.beginPath();
 
-		ctx.stroke();
-	}
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.x + this.width, this.y + this.height);
 
-	public tick(): void {}
+        ctx.closePath();
+
+        ctx.stroke();
+    }
+
+    public tick(): void {}
 }

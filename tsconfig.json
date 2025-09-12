@@ -1,14 +1,14 @@
 {
-  // npm run ts:watch instead of compileOnSave
-  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  "compileOnSave": false,
+    // npm run ts:watch instead of compileOnSave
+    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    "compileOnSave": false,
 
-  "compilerOptions": {
-    "outDir": "js/",
-    "target": "es2015",
-    "esModuleInterop": true,
-    "noUnusedLocals": false,
-    "strict": false,
-    "rootDir": "src/"
-  }
+    "compilerOptions": {
+        "outDir": "js/",
+        "target": "es2015",
+        "esModuleInterop": true,
+        "noUnusedLocals": false,
+        "strict": false,
+        "rootDir": "src/"
+    }
 }

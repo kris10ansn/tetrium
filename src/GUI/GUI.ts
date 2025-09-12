@@ -8,97 +8,100 @@ import { ImageReference } from "./ImageReference";
 import { Line } from "./Line";
 
 export class GUI {
-	public elements = new Array<Widget>();
+    public elements = new Array<Widget>();
 
-	public pauseButton: ImageButton;
+    public pauseButton: ImageButton;
 
-	constructor(private game: Game, private mouse: Mouse) {
-		const pauseImage = new ImageReference("./assets/images/pause.png");
-		const playImage = new ImageReference("./assets/images/play.png");
-		const resetImage = new ImageReference("./assets/images/reset.png");
+    constructor(
+        private game: Game,
+        private mouse: Mouse,
+    ) {
+        const pauseImage = new ImageReference("./assets/images/pause.png");
+        const playImage = new ImageReference("./assets/images/play.png");
+        const resetImage = new ImageReference("./assets/images/reset.png");
 
-		const resumeEvent = event => {
-			this.game.resume();
-			this.pauseButton.imageRef = pauseImage;
-			this.pauseButton.onClick = pauseEvent;
-		};
+        const resumeEvent = (event) => {
+            this.game.resume();
+            this.pauseButton.imageRef = pauseImage;
+            this.pauseButton.onClick = pauseEvent;
+        };
 
-		const pauseEvent = event => {
-			this.game.pause();
-			this.pauseButton.imageRef = playImage;
-			this.pauseButton.onClick = resumeEvent;
-		};
+        const pauseEvent = (event) => {
+            this.game.pause();
+            this.pauseButton.imageRef = playImage;
+            this.pauseButton.onClick = resumeEvent;
+        };
 
-		this.pauseButton = new ImageButton(
-			475,
-			50,
-			75,
-			75,
-			mouse,
-			pauseImage,
-			pauseEvent
-		);
+        this.pauseButton = new ImageButton(
+            475,
+            50,
+            75,
+            75,
+            mouse,
+            pauseImage,
+            pauseEvent,
+        );
 
-		const resetButton = new ImageButton(
-			50,
-			50,
-			75,
-			75,
-			mouse,
-			resetImage,
-			event => {
-				this.game.restart();
-			}
-		);
+        const resetButton = new ImageButton(
+            50,
+            50,
+            75,
+            75,
+            mouse,
+            resetImage,
+            (event) => {
+                this.game.restart();
+            },
+        );
 
-		const scoreText = new TextWidget(
-			300,
-			128,
-			String(this.game.score),
-			"Arial",
-			112,
-			"white",
-			() => {
-				scoreText.text = String(this.game.score);
-			}
-		);
+        const scoreText = new TextWidget(
+            300,
+            128,
+            String(this.game.score),
+            "Arial",
+            112,
+            "white",
+            () => {
+                scoreText.text = String(this.game.score);
+            },
+        );
 
-		const highscoreText = new TextWidget(
-			300,
-			200,
-			String(this.game.highscore),
-			"Arial",
-			32,
-			"white",
-			() => {
-				highscoreText.text = `High score: ${this.game.highscore}`;
-			}
-		);
+        const highscoreText = new TextWidget(
+            300,
+            200,
+            String(this.game.highscore),
+            "Arial",
+            32,
+            "white",
+            () => {
+                highscoreText.text = `High score: ${this.game.highscore}`;
+            },
+        );
 
-		const heightLimitLine = new Line(
-			0,
-			this.game.scl * 4,
-			this.game.canvas.width,
-			this.game.scl * 4,
-			"red"
-		);
+        const heightLimitLine = new Line(
+            0,
+            this.game.scl * 4,
+            this.game.canvas.width,
+            this.game.scl * 4,
+            "red",
+        );
 
-		this.elements.push(this.pauseButton);
-		this.elements.push(resetButton);
-		this.elements.push(scoreText);
-		this.elements.push(highscoreText);
-		this.elements.push(heightLimitLine);
-	}
+        this.elements.push(this.pauseButton);
+        this.elements.push(resetButton);
+        this.elements.push(scoreText);
+        this.elements.push(highscoreText);
+        this.elements.push(heightLimitLine);
+    }
 
-	public tick() {
-		this.elements.forEach(element => {
-			element.tick();
-		});
-	}
+    public tick() {
+        this.elements.forEach((element) => {
+            element.tick();
+        });
+    }
 
-	public render(ctx: CanvasRenderingContext2D) {
-		this.elements.forEach(element => {
-			element.render(ctx);
-		});
-	}
+    public render(ctx: CanvasRenderingContext2D) {
+        this.elements.forEach((element) => {
+            element.render(ctx);
+        });
+    }
 }

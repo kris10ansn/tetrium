@@ -1,39 +1,40 @@
 {
-  "name": "tetrys",
-  "version": "0.5.2",
-  "description": "",
-  "private": true,
-  "sideEffects": false,
-  "scripts": {
-    "publish": "npm run build && npm run zip",
-    "build": "npm run updateHTML && npm run webpack",
-    "webpack": "webpack --config webpack.config.js",
-    "zip": "powershell -command Compress-Archive dist/* zips/output.zip",
-    "live-server": "live-server . --no-browser --watch=js,index.html",
-    "updateHTML": "node scripts/updateHTML.js",
-    "rewritePaths": "node scripts/rewritePaths.js",
-    "ts:compile": "tsc && npm run rewritePaths",
-    "ts:watch": "nodemon -e ts  --exec \"npm run ts:compile\""
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kris10ansn/tetrys.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/kris10ansn/tetrys/issues"
-  },
-  "homepage": "https://github.com/kris10ansn/tetrys#readme",
-  "devDependencies": {
-    "css-loader": "^3.2.0",
-    "filehound": "^1.17.3",
-    "jsdom": "^15.1.1",
-    "style-loader": "^1.0.0",
-    "ts-loader": "^6.0.4",
-    "typescript": "^3.6.2",
-    "webpack": "^4.39.3",
-    "webpack-cli": "^3.3.7"
-  }
+    "name": "tetrys",
+    "version": "0.5.2",
+    "description": "",
+    "private": true,
+    "sideEffects": false,
+    "scripts": {
+        "publish": "npm run build && npm run zip",
+        "build": "npm run updateHTML && npm run webpack",
+        "webpack": "webpack --config webpack.config.js",
+        "zip": "powershell -command Compress-Archive dist/* zips/output.zip",
+        "live-server": "live-server . --no-browser --watch=js,index.html",
+        "updateHTML": "node scripts/updateHTML.js",
+        "rewritePaths": "node scripts/rewritePaths.js",
+        "ts:compile": "tsc && npm run rewritePaths",
+        "ts:watch": "nodemon -e ts  --exec \"npm run ts:compile\""
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kris10ansn/tetrys.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/kris10ansn/tetrys/issues"
+    },
+    "homepage": "https://github.com/kris10ansn/tetrys#readme",
+    "devDependencies": {
+        "css-loader": "^3.2.0",
+        "filehound": "^1.17.3",
+        "jsdom": "^15.1.1",
+        "prettier": "^3.6.2",
+        "style-loader": "^1.0.0",
+        "ts-loader": "^6.0.4",
+        "typescript": "^3.6.2",
+        "webpack": "^4.39.3",
+        "webpack-cli": "^3.3.7"
+    }
 }
