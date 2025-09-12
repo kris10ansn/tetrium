@@ -34,12 +34,12 @@ export class Tetromino extends GameObject {
         this.vel.set(0, this.verticalSpeed);
 
         this.shapeIndex =
-            options.shapeIndex || Math.floor(Math.random() * tetrominos.length);
+            options.shapeIndex ?? Math.floor(Math.random() * tetrominos.length);
         const tetromino = tetrominos[this.shapeIndex];
         this.shape = tetromino.matrix.copy();
         this.color = tetromino.color;
 
-        this.setRotation(options.rotation || 0);
+        this.setRotation(options.rotation ?? 0);
     }
 
     public tick() {
@@ -142,7 +142,7 @@ export class Tetromino extends GameObject {
     private updateState() {
         this.game.storage.setItem(
             "state",
-            Object.assign(this.game.storage.getItem("state") || {}, {
+            Object.assign(this.game.storage.getItem("state") ?? {}, {
                 tetromino: {
                     x: this.x,
                     y: this.y,

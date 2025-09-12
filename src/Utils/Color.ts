@@ -9,7 +9,7 @@ export class Color {
                 5: "#FF8E0D",
                 6: "#FFE138",
                 7: "#3877FF",
-            }[num] || null
+            }[num] ?? null
         );
     }
 
@@ -23,7 +23,7 @@ export class Color {
                 "#FF8E0D": 5,
                 "#FFE138": 6,
                 "#3877FF": 7,
-            }[str] || null
+            }[str] ?? null
         );
     }
 }

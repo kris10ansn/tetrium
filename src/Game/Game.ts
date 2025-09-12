@@ -25,7 +25,7 @@ export class Game {
     public storage = new StorageHandler();
 
     private _score: number = 0;
-    private _highscore: number = this.storage.getItem("hscore") || 0;
+    private _highscore: number = this.storage.getItem("hscore") ?? 0;
 
     public dead = false;
 
@@ -184,15 +184,15 @@ export class Game {
         options?: { shapeIndex?: number; rotation?: number },
     ) {
         return new Tetromino(
-            x == null ? 3 * this.scl : x,
-            y == null ? -4 * this.scl : y,
+            x ?? 3 * this.scl,
+            y ?? -4 * this.scl,
             this.scl,
             { width: this.canvas.width, height: this.canvas.height },
             this.arena,
             this.keyboard,
             this,
             this.smooth,
-            options || {},
+            options ?? {},
         );
     }
 
@@ -205,7 +205,7 @@ export class Game {
 
         this.storage.setItem(
             "state",
-            Object.assign(this.storage.getItem("state") || {}, {
+            Object.assign(this.storage.getItem("state") ?? {}, {
                 score: value,
             }),
         );

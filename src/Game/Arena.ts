@@ -105,7 +105,7 @@ export class Arena {
     private updateState() {
         this.game.storage.setItem(
             "state",
-            Object.assign(this.game.storage.getItem("state") || {}, {
+            Object.assign(this.game.storage.getItem("state") ?? {}, {
                 arena: this.matrix.copy(),
             }),
         );
