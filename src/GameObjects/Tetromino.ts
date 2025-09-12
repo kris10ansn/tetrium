@@ -3,6 +3,7 @@ import { tetrominos } from "./tetrominos";
 import { Keyboard } from "../Game/Keyboard";
 import { Arena } from "../Game/Arena";
 import { Game } from "../Game/Game";
+import { Memo } from "../Utils/Memo";
 
 export class Tetromino extends GameObject {
     public shape: number[][];
@@ -17,6 +18,8 @@ export class Tetromino extends GameObject {
 
     private rotateDelay = 10;
     private rotateTimer = 0;
+
+    private collisionMemo = new Memo(-1, false);
 
     constructor(
         x: number,
@@ -47,12 +50,14 @@ export class Tetromino extends GameObject {
 
         const prevyy = this.yy;
         this.y += this.vel.y;
-        if (this.collide()) {
+
+        if (this.isCollision()) {
             this.y -= this.vel.y;
             this.y = this.yy * this.scl;
             this.arena.merge(this);
             this.game.score += 10;
         }
+
         if (
             this.yy > prevyy &&
             this.vel.y === this.verticalSpeed * this.boost /* if boosting */
@@ -61,7 +66,7 @@ export class Tetromino extends GameObject {
         }
 
         this.x += this.vel.x;
-        if (this.collide()) {
+        if (this.isCollision()) {
             this.x -= this.vel.x;
         }
 
@@ -112,7 +117,11 @@ export class Tetromino extends GameObject {
         ctx.translate(-translate.x, -translate.y);
     }
 
-    private collide(): boolean {
+    private isCollision() {
+        return this.collisionMemo.get(this.yy, this._isCollision.bind(this));
+    }
+
+    private _isCollision(): boolean {
         let collides =
             this.y + this.height * this.scl + this.whitespaceTop * this.scl >=
                 this.canvasSize.height ||
@@ -172,7 +181,7 @@ export class Tetromino extends GameObject {
 
         const prevx = this.x;
         let offset = 1;
-        while (this.collide()) {
+        while (this._isCollision()) {
             this.x += offset * this.scl;
             offset = -(offset + (offset > 0 ? 1 : -1));
             if (offset > this.shape[0].length) {
