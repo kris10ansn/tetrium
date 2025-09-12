@@ -5,4 +5,3 @@ js/
 node_modules/
 zips/
 package-lock.json
-manifest.json
