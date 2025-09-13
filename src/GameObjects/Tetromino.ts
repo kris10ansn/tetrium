@@ -38,9 +38,9 @@ export class Tetromino extends GameObject {
 
         this.shapeIndex =
             options.shapeIndex ?? Math.floor(Math.random() * tetrominos.length);
-        const tetromino = tetrominos[this.shapeIndex];
-        this.shape = tetromino.matrix.copy();
-        this.color = tetromino.color;
+
+        this.shape = tetrominos[this.shapeIndex].matrix.copy();
+        this.color = tetrominos[this.shapeIndex].color;
 
         this.setRotation(options.rotation ?? 0);
     }
@@ -86,15 +86,15 @@ export class Tetromino extends GameObject {
     }
 
     public render(ctx: CanvasRenderingContext2D) {
-        // ctx.save();
-        let translate = { x: null, y: null };
-        if (this.smooth) {
-            translate.x = Math.round(this.x);
-            translate.y = Math.round(this.y);
-        } else {
-            translate.x = Math.round(this.xx) * this.scl;
-            translate.y = Math.round(this.yy) * this.scl;
-        }
+        const translate = this.smooth
+            ? {
+                  x: Math.round(this.x),
+                  y: Math.round(this.y),
+              }
+            : {
+                  x: Math.round(this.xx) * this.scl,
+                  y: Math.round(this.yy) * this.scl,
+              };
 
         ctx.translate(translate.x, translate.y);
 
@@ -112,8 +112,7 @@ export class Tetromino extends GameObject {
                 }
             });
         });
-        // Couldnt do ctx.save/restore as that is already
-        // done in the Game class's render function
+
         ctx.translate(-translate.x, -translate.y);
     }
 
