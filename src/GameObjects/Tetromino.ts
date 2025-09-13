@@ -4,6 +4,7 @@ import { Keyboard } from "../Game/Keyboard";
 import { Arena } from "../Game/Arena";
 import { Game } from "../Game/Game";
 import { Memo } from "../Utils/Memo";
+import { Canvas } from "../Game/Canvas";
 
 export class Tetromino extends GameObject {
     public shape: number[][];
@@ -20,6 +21,8 @@ export class Tetromino extends GameObject {
     private rotateTimer = 0;
 
     private collisionMemo = new Memo("", false);
+
+    private canvas: Canvas;
 
     constructor(
         x: number,
@@ -41,6 +44,12 @@ export class Tetromino extends GameObject {
 
         this.shape = tetrominos[this.shapeIndex].matrix.copy();
         this.color = tetrominos[this.shapeIndex].color;
+
+        this.canvas = new Canvas(
+            this.shape[0].length * this.scl,
+            this.shape.length * this.scl,
+        );
+        this.updateCanvas();
 
         this.setRotation(options.rotation ?? 0);
     }
@@ -86,24 +95,30 @@ export class Tetromino extends GameObject {
     }
 
     public render(ctx: CanvasRenderingContext2D) {
-        const translate = this.smooth
-            ? {
-                  x: Math.round(this.x),
-                  y: Math.round(this.y),
-              }
-            : {
-                  x: Math.round(this.xx) * this.scl,
-                  y: Math.round(this.yy) * this.scl,
-              };
+        if (this.smooth) {
+            ctx.drawImage(this.canvas.element, this.x, this.y);
+        } else {
+            ctx.drawImage(
+                this.canvas.element,
+                this.xx * this.scl,
+                this.yy * this.scl,
+            );
+        }
+    }
 
-        ctx.translate(translate.x, translate.y);
-
-        ctx.fillStyle = this.color;
+    private updateCanvas() {
+        this.canvas.ctx.clearRect(
+            0,
+            0,
+            this.canvas.element.width,
+            this.canvas.element.height,
+        );
+        this.canvas.ctx.fillStyle = this.color;
 
         this.shape.forEach((row, y) => {
             row.forEach((value, x) => {
                 if (value === 1) {
-                    ctx.fillRect(
+                    this.canvas.ctx.fillRect(
                         x * this.scl,
                         y * this.scl,
                         this.scl,
@@ -112,8 +127,6 @@ export class Tetromino extends GameObject {
                 }
             });
         });
-
-        ctx.translate(-translate.x, -translate.y);
     }
 
     private isCollision() {
@@ -199,6 +212,8 @@ export class Tetromino extends GameObject {
 
         this.rotation += dir;
         if (this.rotation > 3) this.rotation = 0;
+
+        this.updateCanvas();
     }
 
     private handleKeys() {
