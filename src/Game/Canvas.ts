@@ -19,6 +19,10 @@ export class Canvas {
         parentNode.appendChild(this.element);
     }
 
+    public clear() {
+        this.ctx.clearRect(0, 0, this.element.width, this.element.height);
+    }
+
     public set blur(value) {
         this.ctx.filter = `blur(${value}px)`;
         this._blur = value;
