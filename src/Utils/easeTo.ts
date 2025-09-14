@@ -4,11 +4,9 @@ export const easeTo = (
     speed: number,
     treshold: number,
 ) => {
-    const result = value + (goal - value) * speed;
-
-    if (Math.abs(goal - result) <= treshold) {
+    if (Math.abs(goal - value) <= treshold) {
         return goal;
     }
 
-    return result;
+    return value + (goal - value) * speed;
 };
