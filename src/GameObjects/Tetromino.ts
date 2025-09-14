@@ -17,9 +17,9 @@ export class Tetromino extends GameObject {
     private rotationDeg = 0;
     private rotationDegGoal = 0;
 
-    private verticalSpeed = 3;
-    private boost = 7;
-    private horizontalSpeed = 12;
+    private verticalSpeed = 4;
+    private boost = 20;
+    private horizontalSpeed = 16;
 
     private rotateDelay = 10;
     private rotateTimer = 0;
@@ -77,7 +77,7 @@ export class Tetromino extends GameObject {
 
         if (
             this.yy > prevyy &&
-            this.vel.y === this.verticalSpeed * this.boost /* if boosting */
+            this.vel.y === this.verticalSpeed + this.boost /* if boosting */
         ) {
             this.game.score += 1;
         }
@@ -235,7 +235,7 @@ export class Tetromino extends GameObject {
         const right = this.keys.get("d") || this.keys.get("arrowright");
 
         if (down) {
-            this.vel.y = this.verticalSpeed * this.boost;
+            this.vel.y = this.verticalSpeed + this.boost;
         } else {
             this.vel.y = this.verticalSpeed;
         }
@@ -279,12 +279,7 @@ export class Tetromino extends GameObject {
     }
 
     private slideToTile() {
-        // Distance to perfect tile placement
-        const v = Math.round((this.xx * this.scl - this.x) / 3);
-
-        // If the distance to the destination is less than .5 pixels
-        // just jump directly to the destination
-        this.vel.x = v === 0 ? this.xx * this.scl - this.x : v;
+        this.vel.x = easeTo(this.xx * this.scl, this.x, 0.2, 0.01) - this.x;
     }
 
     private setRotation(value) {
