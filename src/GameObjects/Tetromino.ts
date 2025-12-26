@@ -53,7 +53,10 @@ export class Tetromino extends GameObject {
         this.canvas = new Canvas(canvasSize.width, canvasSize.height);
         this.draw();
 
-        this.setRotation(options.rotation ?? 0);
+        for (let i = 0; i < (options.rotation ?? 0); i++) {
+            rotateMatrix(this.shape, 1);
+            this.rotationDegGoal = this.rotationDeg += (1 / 4) * (2 * Math.PI);
+        }
     }
 
     public tick() {
@@ -275,17 +278,6 @@ export class Tetromino extends GameObject {
 
     private slideToTile() {
         this.vel.x = easeTo(this.xx * this.scl, this.x, 0.2, 0.01) - this.x;
-    }
-
-    private setRotation(value) {
-        let i = 0;
-        while (this.rotation !== value) {
-            if (i >= 4) return;
-            this.rotate(1);
-            i++;
-        }
-
-        this.rotationDegGoal = this.rotationDeg;
     }
 
     get xx() {
