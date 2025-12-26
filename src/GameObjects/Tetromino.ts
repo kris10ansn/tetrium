@@ -6,6 +6,7 @@ import { Game } from "../Game/Game";
 import { Memo } from "../Utils/Memo";
 import { Canvas } from "../Game/Canvas";
 import { easeTo } from "../Utils/easeTo";
+import { rotateMatrix } from "../Utils/Matrix";
 
 export class Tetromino extends GameObject {
     public shape: number[][];
@@ -194,37 +195,26 @@ export class Tetromino extends GameObject {
         );
     }
 
-    private rotate(dir = 1) {
-        for (let y = 0; y < this.shape.length; ++y) {
-            for (let x = 0; x < y; ++x) {
-                [this.shape[x][y], this.shape[y][x]] = [
-                    this.shape[y][x],
-                    this.shape[x][y],
-                ];
-            }
-        }
-
-        if (dir === 1) {
-            this.shape.forEach((row) => row.reverse());
-        } else {
-            this.shape.reverse();
-            return;
-        }
+    private rotate(dir: 1 | -1 = 1) {
+        rotateMatrix(this.shape, dir);
 
         const prevx = this.x;
         let offset = 1;
+
         while (this._isCollision()) {
             this.x += offset * this.scl;
             offset = -(offset + (offset > 0 ? 1 : -1));
+
             if (offset > this.shape[0].length) {
                 this.x = prevx;
-                this.rotate(-dir);
+                this.rotate(-dir as 1 | -1);
                 return;
             }
         }
 
         this.rotation += dir;
         this.rotationDegGoal += (dir / 4) * (2 * Math.PI);
+
         if (this.rotation > 3) this.rotation = 0;
     }
 
