@@ -17,7 +17,7 @@ export class Tetromino extends GameObject {
     private rotationDeg = 0;
     private rotationDegGoal = 0;
 
-    private verticalSpeed = 4;
+    private verticalSpeed = 3;
     private boost = 20;
     private horizontalSpeed = 16;
 
@@ -229,7 +229,11 @@ export class Tetromino extends GameObject {
     }
 
     private handleKeys() {
-        const up = this.keys.get("w") || this.keys.get("arrowup");
+        const up =
+            this.keys.get("w") ||
+            this.keys.get("arrowup") ||
+            this.keys.get("e");
+        const q = this.keys.get("q");
         const left = this.keys.get("a") || this.keys.get("arrowleft");
         const down = this.keys.get("s") || this.keys.get("arrowdown");
         const right = this.keys.get("d") || this.keys.get("arrowright");
@@ -270,11 +274,12 @@ export class Tetromino extends GameObject {
             this.slideToTile();
         }
 
-        if (up) {
-            if (this.rotateTimer <= 0) {
-                this.rotate();
-                this.rotateTimer = this.rotateDelay;
-            }
+        if (up && this.rotateTimer <= 0) {
+            this.rotate();
+            this.rotateTimer = this.rotateDelay;
+        } else if (q && this.rotateTimer <= 0) {
+            this.rotate(-1);
+            this.rotateTimer = this.rotateDelay;
         }
     }
 
